@@ -11,20 +11,17 @@ public class Login extends JPanel {
 
     public Login() {
         setBackground(Color.WHITE);
-        setLayout(new GridBagLayout()); // Để các thành phần nằm giữa
+        setLayout(new GridBagLayout()); 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        // Add các thành phần vào Panel
         gbc.gridx = 0; gbc.gridy = 0;
         add(new JLabel("Mã nhân viên:"), gbc);
-        
         gbc.gridx = 1;
         add(txtUser, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
         add(new JLabel("Mật khẩu:"), gbc);
-
         gbc.gridx = 1;
         add(txtPass, gbc);
 
@@ -32,7 +29,11 @@ public class Login extends JPanel {
         add(btnLogin, gbc);
     }
 
-    // Hàm này giúp Class khác gắn sự kiện vào nút Login
+    // --- QUAN TRỌNG: Cần hàm này để lấy nút ra gắn sự kiện ---
+    public CustomButton getBtnLogin() {
+        return btnLogin;
+    }
+
     public void addLoginEvent(ActionListener event) {
         btnLogin.addActionListener(event);
     }
