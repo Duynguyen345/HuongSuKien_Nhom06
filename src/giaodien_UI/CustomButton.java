@@ -6,31 +6,33 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class CustomButton extends JButton {
+
     private Color originalColor;
     private Color hoverColor;
+    private boolean isActive = false;
 
     public CustomButton(String text, Color bg, Color fg) {
         super(text);
         this.originalColor = bg;
-        this.hoverColor = bg.brighter(); // Tự tạo màu sáng hơn để hover
+        this.hoverColor    = bg.brighter();
 
-        // Thiết kế basic cho nút
-        setContentAreaFilled(true); // Cho phép hiển thị màu nền
         setBackground(originalColor);
         setForeground(fg);
-        setFocusPainted(false); // Xóa cái khung viền khi click vào
-        setFont(new Font("Arial", Font.BOLD, 14));
+        setFocusPainted(false);
+        setBorderPainted(false);
+        setFont(new Font("Segoe UI", Font.BOLD, 14));
+        setHorizontalAlignment(SwingConstants.LEFT);
+        setMargin(new Insets(0, 16, 0, 0));
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Xử lý hiệu ứng chuột (Hover effect)
         addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                setBackground(hoverColor); // Chuột bay vào thì đổi màu sáng
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                setBackground(originalColor); // Chuột bay ra thì về màu cũ
-            }
+            @Override public void mouseEntered(MouseEvent e) { if (!isActive) setBackground(hoverColor); }
+            @Override public void mouseExited(MouseEvent e)  { if (!isActive) setBackground(originalColor); }
         });
+    }
+
+    public void setActive(boolean active) {
+        this.isActive = active;
+        setBackground(active ? hoverColor : originalColor);
     }
 }
