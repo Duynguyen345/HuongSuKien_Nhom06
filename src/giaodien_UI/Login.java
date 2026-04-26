@@ -48,4 +48,10 @@ public class Login extends JPanel {
     }
 
     public CustomButton getBtnLogin() { return btnLogin; }
+
+    /** Trả về Mã nhân viên đã nhập */
+    public String getMaNV()    { return txtUser.getText().trim(); }
+
+    /** Trả về Mật khẩu đã nhập */
+    public String getMatKhau() { return new String(txtPass.getPassword()); }
 }

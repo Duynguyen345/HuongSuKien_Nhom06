@@ -1,8 +1,12 @@
 package giaodien_UI;
 
+import dAO.NHANVIEN_DAO;
+import model.NhanVien;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.sql.SQLException;
 
 public class ConvenienceStoreView extends JFrame {
 
@@ -12,6 +16,9 @@ public class ConvenienceStoreView extends JFrame {
     private CustomButton btnBanHang, btnHoaDon, btnSanPham, btnLoHang,
                          btnKhachHang, btnThongKe, btnNhanVien;
     private CustomButton[] menuButtons;
+
+    /** Thông tin nhân viên đang đăng nhập */
+    private NhanVien currentUser = null;
 
     public ConvenienceStoreView() {
         setTitle("Hệ thống Cửa hàng Tiện lợi");
@@ -25,13 +32,42 @@ public class ConvenienceStoreView extends JFrame {
         wrapper.add(loginPanel);
         setContentPane(wrapper);
 
-        // Sự kiện đăng nhập
-        loginPanel.getBtnLogin().addActionListener(e -> {
-            buildMainDashboard();
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
-            revalidate();
-            repaint();
-        });
+        // ── Sự kiện đăng nhập – xác thực qua SQL Server ──
+        loginPanel.getBtnLogin().addActionListener(e -> handleLogin());
+    }
+
+    /** Xử lý đăng nhập: xác thực với DB, nếu đúng mới vào Dashboard. */
+    private void handleLogin() {
+        String maNV    = loginPanel.getMaNV();
+        String matKhau = loginPanel.getMatKhau();
+
+        if (maNV.isEmpty() || matKhau.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Vui lòng nhập đầy đủ Mã nhân viên và Mật khẩu.",
+                "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            NHANVIEN_DAO dao = new NHANVIEN_DAO();
+            currentUser = dao.dangNhap(maNV, matKhau);
+
+            if (currentUser != null) {
+                buildMainDashboard();
+                setExtendedState(JFrame.MAXIMIZED_BOTH);
+                revalidate();
+                repaint();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Mã nhân viên hoặc mật khẩu không đúng.\nVui lòng thử lại.",
+                    "Đăng nhập thất bại", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this,
+                "Lỗi kết nối cơ sở dữ liệu:\n" + ex.getMessage(),
+                "Lỗi hệ thống", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
     }
 
     // ------------------------------------------------------------------ //
@@ -93,7 +129,10 @@ public class ConvenienceStoreView extends JFrame {
         sidebar.add(makeSeparator());
         sidebar.add(Box.createRigidArea(new Dimension(0, 12)));
 
-        JLabel user = new JLabel("👤  Admin  |  Quản trị viên");
+        String displayName = (currentUser != null)
+                ? "👤  " + currentUser.getTenNV() + "  |  " + currentUser.getVaiTro()
+                : "👤  Admin  |  Nhân viên";
+        JLabel user = new JLabel(displayName);
         user.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         user.setForeground(new Color(150, 180, 200));
         user.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -134,16 +173,19 @@ public class ConvenienceStoreView extends JFrame {
         avatar.setOpaque(false);
         avatar.setPreferredSize(new Dimension(40, 40));
 
-        // Tên và vai trò
+        // Tên và vai trò – lấy từ currentUser sau khi đăng nhập thành công
         JPanel namePanel = new JPanel();
         namePanel.setLayout(new BoxLayout(namePanel, BoxLayout.Y_AXIS));
         namePanel.setOpaque(false);
 
-        JLabel lblName = new JLabel("Admin");
+        String tenHV  = (currentUser != null) ? currentUser.getTenNV()   : "Admin";
+        String chucVu = (currentUser != null) ? currentUser.getVaiTro() : "Nhân viên";
+
+        JLabel lblName = new JLabel(tenHV);
         lblName.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblName.setForeground(new Color(33, 47, 61));
 
-        JLabel lblRole = new JLabel("Quản trị viên");
+        JLabel lblRole = new JLabel(chucVu);
         lblRole.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblRole.setForeground(new Color(120, 140, 160));
 
@@ -184,7 +226,7 @@ public class ConvenienceStoreView extends JFrame {
         mainContent.add(makePage("Quản lý Lô hàng"),   "LO_HANG");
         mainContent.add(makePage("Dữ liệu Khách hàng"),"KHACH_HANG");
         mainContent.add(makePage("Báo cáo Thống kê"),  "THONG_KE");
-        mainContent.add(makePage("Quản lý Nhân viên"),  "NHAN_VIEN");
+        mainContent.add(new QuanLyNhanVien_GUI(),      "NHAN_VIEN");
 
         return mainContent;
     }
