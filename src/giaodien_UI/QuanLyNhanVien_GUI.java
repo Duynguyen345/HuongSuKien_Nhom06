@@ -4,8 +4,12 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-public class QuanLyNhanVien_GUI extends JPanel {
+public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseListener {
 
     // Components
     private JTextField txtMaNV, txtTenNV, txtDiaChi, txtSdt, txtNgayVaoLam, txtTimKiem;
@@ -152,5 +156,68 @@ public class QuanLyNhanVien_GUI extends JPanel {
         scrollPane.getViewport().setBackground(Color.WHITE);
 
         add(scrollPane, BorderLayout.CENTER);
+        
+        // Đăng ký sự kiện
+        btnThem.addActionListener(this);
+        btnXoa.addActionListener(this);
+        btnSua.addActionListener(this);
+        btnXoaTrang.addActionListener(this);
+        btnTimKiem.addActionListener(this);
+        table.addMouseListener(this);
     }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object o = e.getSource();
+        if (o.equals(btnThem)) {
+            JOptionPane.showMessageDialog(this, "Chức năng Thêm đang được xây dựng!");
+        } else if (o.equals(btnXoa)) {
+            JOptionPane.showMessageDialog(this, "Chức năng Xóa đang được xây dựng!");
+        } else if (o.equals(btnSua)) {
+            JOptionPane.showMessageDialog(this, "Chức năng Sửa đang được xây dựng!");
+        } else if (o.equals(btnXoaTrang)) {
+            xoaTrang();
+        } else if (o.equals(btnTimKiem)) {
+            JOptionPane.showMessageDialog(this, "Chức năng Tìm kiếm đang được xây dựng!");
+        }
+    }
+
+    private void xoaTrang() {
+        txtMaNV.setText("");
+        txtTenNV.setText("");
+        txtDiaChi.setText("");
+        txtSdt.setText("");
+        txtNgayVaoLam.setText("");
+        txtMatKhau.setText("");
+        txtTimKiem.setText("");
+        cbGioiTinh.setSelectedIndex(0);
+        cbVaiTro.setSelectedIndex(0);
+        txtMaNV.requestFocus();
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        int row = table.getSelectedRow();
+        if (row >= 0) {
+            txtMaNV.setText(tableModel.getValueAt(row, 0).toString());
+            txtTenNV.setText(tableModel.getValueAt(row, 1).toString());
+            cbGioiTinh.setSelectedItem(tableModel.getValueAt(row, 2).toString());
+            txtSdt.setText(tableModel.getValueAt(row, 3).toString());
+            txtNgayVaoLam.setText(tableModel.getValueAt(row, 4).toString());
+            cbVaiTro.setSelectedItem(tableModel.getValueAt(row, 5).toString());
+            txtDiaChi.setText(tableModel.getValueAt(row, 6).toString());
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {}
+
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
 }
