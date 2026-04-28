@@ -7,19 +7,26 @@ import java.awt.event.*;
 
 import dAO.HangHoa_DAO;
 import dAO.KhachHang_DAO;
+import dAO.HoaDon_DAO;
 import model.*;
 
 public class FrmBanHang extends JPanel {
     private JTextField txtMaVach, txtSDT;
+    // ── Bảng danh sách sản phẩm (thêm mới, không ảnh hưởng code cũ) ──
+    private JTable tblSanPham;
+    private DefaultTableModel modelSanPham;
     private JTable tblGioHang;
     private DefaultTableModel modelGioHang;
     private JLabel lblTongTien, lblGiamGiaKH, lblTenKH, lblThanhTien;
     private CustomButton btnThanhToan, btnHuyDon, btnXoaDong;
     private JLabel lblIconBarcode, lblIconSearch;
     
-    private HangHoa_DAO hhDAO = new HangHoa_DAO();
+    private HangHoa_DAO hhDAO  = new HangHoa_DAO();
     private KhachHang_DAO khDAO = new KhachHang_DAO();
+    private HoaDon_DAO hdDAO   = new HoaDon_DAO();
     private KhachHang khachHangHienTai = null;
+    /** Mã NV đăng nhập – thiết lập từ ConvenienceStoreView sau login */
+    public String maNVHienTai = "NV001";
 
     public FrmBanHang() {
         setLayout(new BorderLayout(10, 10));
@@ -37,13 +44,56 @@ public class FrmBanHang extends JPanel {
         pnlTop.add(txtMaVach);
         add(pnlTop, BorderLayout.NORTH);
 
-        // --- TRUNG TÂM (CENTER): Bảng hiển thị giỏ hàng ---
+        // --- TRUNG TÂM (CENTER): Danh sách SP (trái) | Giỏ hàng (phải) ---
         String[] columns = {"STT", "Mã hàng", "Tên sản phẩm", "Số lượng", "Đơn giá", "Thành tiền"};
         modelGioHang = new DefaultTableModel(columns, 0);
         tblGioHang = new JTable(modelGioHang);
         tblGioHang.setRowHeight(40);
         tblGioHang.setFont(new Font("Arial", Font.PLAIN, 15));
-        add(new JScrollPane(tblGioHang), BorderLayout.CENTER);
+
+        // Bảng danh sách hàng hóa từ DB
+        String[] colsSP = {"Mã hàng", "Tên sản phẩm", "Đơn giá"};
+        modelSanPham = new DefaultTableModel(colsSP, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+        tblSanPham = new JTable(modelSanPham);
+        tblSanPham.setRowHeight(30);
+        tblSanPham.setFont(new Font("Arial", Font.PLAIN, 13));
+        tblSanPham.setSelectionBackground(new Color(52, 152, 219));
+        tblSanPham.setSelectionForeground(Color.WHITE);
+        tblSanPham.getColumnModel().getColumn(0).setPreferredWidth(70);
+        tblSanPham.getColumnModel().getColumn(1).setPreferredWidth(200);
+        tblSanPham.getColumnModel().getColumn(2).setPreferredWidth(80);
+        // Double-click → thêm vào giỏ (gọi lại themVaoGioHang đã có sẵn)
+        tblSanPham.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int row = tblSanPham.getSelectedRow();
+                    if (row >= 0) {
+                        String maVach = modelSanPham.getValueAt(row, 0).toString();
+                        HangHoa sp = hhDAO.timTheoMaVach(maVach);
+                        if (sp == null) {
+                            // Tìm theo maHH thay vì maVach
+                            sp = hhDAO.timTheoMaHH(maVach);
+                        }
+                        if (sp != null) { themVaoGioHang(sp); tinhTongTien(); }
+                    }
+                }
+            }
+        });
+
+        JScrollPane scrollSP = new JScrollPane(tblSanPham);
+        scrollSP.setBorder(BorderFactory.createTitledBorder("Hàng hóa (double-click để thêm)"));
+
+        JSplitPane splitCenter = new JSplitPane(
+            JSplitPane.HORIZONTAL_SPLIT,
+            scrollSP,
+            new JScrollPane(tblGioHang)
+        );
+        splitCenter.setDividerLocation(380);
+        splitCenter.setBorder(null);
+        add(splitCenter, BorderLayout.CENTER);
+        taiDanhSachSanPham();
 
         // --- PHÍA ĐÔNG (EAST): Khu vực Thanh toán (Nới rộng lên 400px để không mất chữ) ---
         JPanel pnlRight = new JPanel();
@@ -216,21 +266,45 @@ public class FrmBanHang extends JPanel {
 
         btnThanhToan.addActionListener(e -> {
             if (modelGioHang.getRowCount() > 0) {
-                double tongTien = tinhThanhTienSauGiam();
-                
-                // Mở cửa sổ thanh toán
-                // (Ép kiểu top-level window làm parent để dialog hiển thị giữa màn hình)
+                double tongGoc     = 0;
+                for (int i = 0; i < modelGioHang.getRowCount(); i++)
+                    tongGoc += ((Number) modelGioHang.getValueAt(i, 5)).doubleValue();
+                double tienGiam    = tinhTienGiam();
+                double tongThanhToan = tinhThanhTienSauGiam();
+
+                String maHD = hdDAO.sinhMaHD();
                 Window parentWindow = SwingUtilities.getWindowAncestor(this);
-                DialogThanhToan dialog = new DialogThanhToan((Frame) parentWindow, tongTien, "HD123");
-                dialog.setVisible(true); // Code sẽ dừng ở dòng này chờ user thao tác trên Dialog
-                
-                // Sau khi dialog đóng, kiểm tra xem user đã bấm "Xác nhận" hay "Hủy"
+                ThanhToanPanel dialog = new ThanhToanPanel((Frame) parentWindow, tongThanhToan, maHD);
+                dialog.setVisible(true);
+
                 if (dialog.isThanhToanThanhCong()) {
-                    JOptionPane.showMessageDialog(this, "Hóa đơn đã được lưu vào hệ thống!");
-                    // Tại đây gọi SQL: getHoaDonData() ...
+                    // Xây dựng danh sách chi tiết
+                    java.util.List<Object[]> chiTiet = new java.util.ArrayList<>();
+                    for (int i = 0; i < modelGioHang.getRowCount(); i++) {
+                        chiTiet.add(new Object[]{
+                            modelGioHang.getValueAt(i, 1),  // maHH
+                            modelGioHang.getValueAt(i, 3),  // soLuong
+                            modelGioHang.getValueAt(i, 4),  // donGia
+                            modelGioHang.getValueAt(i, 5)   // thanhTien
+                        });
+                    }
+                    String maKH = (khachHangHienTai != null) ? khachHangHienTai.getMaKH() : null;
+                    try {
+                        hdDAO.luuHoaDon(maHD, maNVHienTai, maKH,
+                            dialog.getHinhThuc(),
+                            tongGoc, tienGiam, tongThanhToan, chiTiet);
+                        JOptionPane.showMessageDialog(this,
+                            "Hóa đơn " + maHD + " đã được lưu vào hệ thống!");
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(this,
+                            "Lỗi lưu hóa đơn:\n" + ex.getMessage(),
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
                     modelGioHang.setRowCount(0);
                     txtSDT.setText("");
                     khachHangHienTai = null;
+                    lblTenKH.setText("Khách: Vãng lai");
+                    lblGiamGiaKH.setText("Chiết khấu: 0%");
                     tinhTongTien();
                 }
             } else {
@@ -302,5 +376,18 @@ public class FrmBanHang extends JPanel {
             }
         }
         return (khachHangHienTai != null) ? tamTinh * (khachHangHienTai.getLoaiKH().getGiamGia() / 100.0) : 0;
+    }
+
+    // ── THÊM MỚI: Tải danh sách hàng hóa từ DB vào bảng bên trái ──
+    private void taiDanhSachSanPham() {
+        modelSanPham.setRowCount(0);
+        java.util.List<HangHoa> list = hhDAO.layTatCa();
+        for (HangHoa h : list) {
+            modelSanPham.addRow(new Object[]{
+                h.getMaHH(),
+                h.getTenHH(),
+                String.format("%,.0f đ", h.getGiaSP())
+            });
+        }
     }
 }

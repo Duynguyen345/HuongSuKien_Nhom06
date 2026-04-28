@@ -4,10 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
 
-public class DialogThanhToan extends JDialog {
+public class ThanhToanPanel extends JDialog {
     private boolean isThanhToanThanhCong = false;
+    private String hinhThuc = "TIEN_MAT"; // mã DB mặc định
 
-    public DialogThanhToan(Frame parent, double tongTien, String maHoaDon) {
+    public ThanhToanPanel(Frame parent, double tongTien, String maHoaDon) {
         super(parent, "Xác nhận thanh toán", true); // true = Bắt buộc phải tắt dialog này mới bấm được phần khác
         setSize(500, 450);
         setLocationRelativeTo(parent);
@@ -51,6 +52,12 @@ public class DialogThanhToan extends JDialog {
         // --- Xử lý sự kiện chuyển đổi ---
         CardLayout cl = (CardLayout) (pnlCenter.getLayout());
         cbPhuongThuc.addActionListener(e -> {
+            // Map text hiển thị → mã DB
+            switch (cbPhuongThuc.getSelectedIndex()) {
+                case 0: hinhThuc = "TIEN_MAT";     break;
+                case 1: hinhThuc = "CHUYEN_KHOAN"; break;
+                default: hinhThuc = "TIEN_MAT";
+            }
             if (cbPhuongThuc.getSelectedIndex() == 0) {
                 cl.show(pnlCenter, "TIEN_MAT");
             } else {
@@ -81,7 +88,6 @@ public class DialogThanhToan extends JDialog {
         btnHuy.addActionListener(e -> dispose());
     }
 
-    public boolean isThanhToanThanhCong() {
-        return isThanhToanThanhCong;
-    }
+    public boolean isThanhToanThanhCong() { return isThanhToanThanhCong; }
+    public String getHinhThuc()           { return hinhThuc; }
 }

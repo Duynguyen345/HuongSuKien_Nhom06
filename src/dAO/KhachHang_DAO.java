@@ -8,8 +8,8 @@ import model.LoaiKhachHang;
 public class KhachHang_DAO {
     public KhachHang timKhachHangTheoSDT(String sdt) {
         KhachHang kh = null;
-        String sql = "SELECT k.*, l.tenLKH, l.giamGia FROM KHACHHANG k " +
-                     "JOIN LOAIKHACHHANG l ON k.maLKH = l.maLKH WHERE soDienThoai = ?";
+        String sql = "SELECT k.*, l.tenLKH, l.giamGia FROM KhachHang k " +
+                     "JOIN LoaiKhachHang l ON k.maLKH = l.maLKH WHERE k.soDienThoai = ?";
         
         try (Connection con = ConnectDB.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {

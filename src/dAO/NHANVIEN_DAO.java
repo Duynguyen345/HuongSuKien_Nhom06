@@ -5,60 +5,42 @@ import model.NhanVien;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * NHANVIEN_DAO – Data Access Object cho bảng NHANVIEN.
+ * NHANVIEN_DAO – Data Access Object cho bảng NhanVien trong quanlycuahangtienloi.
  *
- * Cấu trúc bảng:
- *   maNV       NVARCHAR(20)  PK   – Mã nhân viên (dùng để đăng nhập)
- *   tenNV      NVARCHAR(100)      – Tên nhân viên
- *   diaChi     NVARCHAR(255)      – Địa chỉ
- *   ngayVaoLam DATE               – Ngày vào làm
- *   gioiTinh   NVARCHAR(10)       – Giới tính
- *   sdt        NVARCHAR(15)       – Số điện thoại
- *   matKhau    NVARCHAR(255)      – Mật khẩu
- *   quanLy     BIT                – 1 = Quản lý | 0 = Nhân viên thu ngân
+ * Schema bảng NhanVien:
+ *   maNV        VARCHAR(10)   PK
+ *   tenNV       NVARCHAR(100)
+ *   diaChi      NVARCHAR(255) NULL
+ *   ngayVaoLam  DATE
+ *   gioiTinh    BIT           -- 1=Nam, 0=Nữ
+ *   sdt         VARCHAR(15)
+ *   matKhau     VARCHAR(255)
+ *   quanLy      BIT           -- 1=Quản lý, 0=Thu ngân
  */
 public class NHANVIEN_DAO {
 
-    // ─── Tên bảng & cột ───────────────────────────────────────
-    private static final String TABLE        = "NHANVIEN";
-    private static final String COL_MA       = "maNV";
-    private static final String COL_TEN      = "tenNV";
-    private static final String COL_DIA_CHI  = "diaChi";
-    private static final String COL_NGAY     = "ngayVaoLam";
-    private static final String COL_GIOI     = "gioiTinh";
-    private static final String COL_SDT      = "sdt";
-    private static final String COL_PASS     = "matKhau";
-    private static final String COL_QUAN_LY  = "quanLy";
-    // ──────────────────────────────────────────────────────────
+    private static final String TABLE = "NhanVien";
 
     // ══════════════════════════════════════════════════════════
     //  1. XÁC THỰC ĐĂNG NHẬP
     // ══════════════════════════════════════════════════════════
 
-    /**
-     * Xác thực đăng nhập – trả về NhanVien nếu đúng, null nếu sai.
-     *
-     * @param maNV    Mã nhân viên nhập từ form
-     * @param matKhau Mật khẩu nhập từ form
-     */
     public NhanVien dangNhap(String maNV, String matKhau) throws SQLException {
-        String sql = "SELECT " + COL_MA + ", " + COL_TEN + ", " + COL_QUAN_LY
-                   + " FROM " + TABLE
-                   + " WHERE " + COL_MA   + " = ?"
-                   + "   AND " + COL_PASS + " = ?";
-
+        String sql = "SELECT maNV, tenNV, quanLy FROM " + TABLE
+                   + " WHERE maNV = ? AND matKhau = ?";
         try (PreparedStatement ps = ConnectDB.getConnection().prepareStatement(sql)) {
             ps.setString(1, maNV.trim());
             ps.setString(2, matKhau);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return new NhanVien(
-                        rs.getString(COL_MA),
-                        rs.getString(COL_TEN),
-                        rs.getBoolean(COL_QUAN_LY)
+                        rs.getString("maNV"),
+                        rs.getString("tenNV"),
+                        rs.getBoolean("quanLy")
                     );
                 }
             }
@@ -67,18 +49,46 @@ public class NHANVIEN_DAO {
     }
 
     // ══════════════════════════════════════════════════════════
-    //  2. LẤY THÔNG TIN NHÂN VIÊN ĐẦY ĐỦ
+    //  2. LẤY TẤT CẢ NHÂN VIÊN
     // ══════════════════════════════════════════════════════════
 
-    /**
-     * Lấy toàn bộ thông tin nhân viên theo mã.
-     */
-    public NhanVien timTheoMa(String maNV) throws SQLException {
-        String sql = "SELECT * FROM " + TABLE + " WHERE " + COL_MA + " = ?";
+    public List<NhanVien> layTatCa() throws SQLException {
+        List<NhanVien> list = new ArrayList<>();
+        String sql = "SELECT * FROM " + TABLE + " ORDER BY maNV";
+        try (PreparedStatement ps = ConnectDB.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) list.add(mapRow(rs));
+        }
+        return list;
+    }
 
+    // ══════════════════════════════════════════════════════════
+    //  3. TÌM KIẾM THEO MÃ HOẶC TÊN
+    // ══════════════════════════════════════════════════════════
+
+    public List<NhanVien> timKiem(String keyword) throws SQLException {
+        String kw  = "%" + keyword.trim() + "%";
+        String sql = "SELECT * FROM " + TABLE
+                   + " WHERE maNV LIKE ? OR tenNV LIKE ? ORDER BY maNV";
+        List<NhanVien> list = new ArrayList<>();
+        try (PreparedStatement ps = ConnectDB.getConnection().prepareStatement(sql)) {
+            ps.setString(1, kw);
+            ps.setString(2, kw);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        }
+        return list;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //  4. TÌM THEO MÃ
+    // ══════════════════════════════════════════════════════════
+
+    public NhanVien timTheoMa(String maNV) throws SQLException {
+        String sql = "SELECT * FROM " + TABLE + " WHERE maNV = ?";
         try (PreparedStatement ps = ConnectDB.getConnection().prepareStatement(sql)) {
             ps.setString(1, maNV.trim());
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapRow(rs);
             }
@@ -87,25 +97,32 @@ public class NHANVIEN_DAO {
     }
 
     // ══════════════════════════════════════════════════════════
-    //  3. THÊM NHÂN VIÊN MỚI
+    //  5. KIỂM TRA TRÙNG MÃ
     // ══════════════════════════════════════════════════════════
 
-    /**
-     * @return true nếu thêm thành công
-     */
+    public boolean tonTai(String maNV) throws SQLException {
+        String sql = "SELECT 1 FROM " + TABLE + " WHERE maNV = ?";
+        try (PreparedStatement ps = ConnectDB.getConnection().prepareStatement(sql)) {
+            ps.setString(1, maNV.trim());
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //  6. THÊM
+    // ══════════════════════════════════════════════════════════
+
     public boolean them(NhanVien nv) throws SQLException {
         String sql = "INSERT INTO " + TABLE
-                   + " (" + COL_MA + "," + COL_TEN + "," + COL_DIA_CHI + ","
-                   +        COL_NGAY + "," + COL_GIOI + "," + COL_SDT + ","
-                   +        COL_PASS + "," + COL_QUAN_LY + ")"
+                   + " (maNV, tenNV, diaChi, ngayVaoLam, gioiTinh, sdt, matKhau, quanLy)"
                    + " VALUES (?,?,?,?,?,?,?,?)";
-
         try (PreparedStatement ps = ConnectDB.getConnection().prepareStatement(sql)) {
             ps.setString(1, nv.getMaNV());
             ps.setString(2, nv.getTenNV());
             ps.setString(3, nv.getDiaChi());
-            ps.setObject(4, nv.getNgayVaoLam()); // LocalDate → DATE
-            ps.setString(5, nv.getGioiTinh());
+            ps.setObject(4, nv.getNgayVaoLam());
+            // gioiTinh BIT: "Nam" → 1, "Nữ" → 0
+            ps.setBoolean(5, "Nam".equalsIgnoreCase(nv.getGioiTinh()));
             ps.setString(6, nv.getSdt());
             ps.setString(7, nv.getMatKhau());
             ps.setBoolean(8, nv.isQuanLy());
@@ -114,28 +131,18 @@ public class NHANVIEN_DAO {
     }
 
     // ══════════════════════════════════════════════════════════
-    //  4. CẬP NHẬT THÔNG TIN
+    //  7. CẬP NHẬT
     // ══════════════════════════════════════════════════════════
 
-    /**
-     * @return true nếu cập nhật thành công
-     */
     public boolean capNhat(NhanVien nv) throws SQLException {
         String sql = "UPDATE " + TABLE + " SET "
-                   + COL_TEN     + " = ?, "
-                   + COL_DIA_CHI + " = ?, "
-                   + COL_NGAY    + " = ?, "
-                   + COL_GIOI    + " = ?, "
-                   + COL_SDT     + " = ?, "
-                   + COL_PASS    + " = ?, "
-                   + COL_QUAN_LY + " = ? "
-                   + "WHERE " + COL_MA + " = ?";
-
+                   + "tenNV=?, diaChi=?, ngayVaoLam=?, gioiTinh=?, sdt=?, matKhau=?, quanLy=? "
+                   + "WHERE maNV=?";
         try (PreparedStatement ps = ConnectDB.getConnection().prepareStatement(sql)) {
             ps.setString(1, nv.getTenNV());
             ps.setString(2, nv.getDiaChi());
             ps.setObject(3, nv.getNgayVaoLam());
-            ps.setString(4, nv.getGioiTinh());
+            ps.setBoolean(4, "Nam".equalsIgnoreCase(nv.getGioiTinh()));
             ps.setString(5, nv.getSdt());
             ps.setString(6, nv.getMatKhau());
             ps.setBoolean(7, nv.isQuanLy());
@@ -145,15 +152,11 @@ public class NHANVIEN_DAO {
     }
 
     // ══════════════════════════════════════════════════════════
-    //  5. XOÁ NHÂN VIÊN
+    //  8. XÓA
     // ══════════════════════════════════════════════════════════
 
-    /**
-     * @return true nếu xoá thành công
-     */
     public boolean xoa(String maNV) throws SQLException {
-        String sql = "DELETE FROM " + TABLE + " WHERE " + COL_MA + " = ?";
-
+        String sql = "DELETE FROM " + TABLE + " WHERE maNV = ?";
         try (PreparedStatement ps = ConnectDB.getConnection().prepareStatement(sql)) {
             ps.setString(1, maNV.trim());
             return ps.executeUpdate() > 0;
@@ -161,22 +164,24 @@ public class NHANVIEN_DAO {
     }
 
     // ══════════════════════════════════════════════════════════
-    //  6. HELPER – ánh xạ ResultSet → NhanVien
+    //  HELPER – ResultSet → NhanVien
+    //  gioiTinh BIT: 1 → "Nam", 0 → "Nữ"
     // ══════════════════════════════════════════════════════════
 
     private NhanVien mapRow(ResultSet rs) throws SQLException {
-        Date sqlDate = rs.getDate(COL_NGAY);
+        Date sqlDate = rs.getDate("ngayVaoLam");
         LocalDate ngay = (sqlDate != null) ? sqlDate.toLocalDate() : null;
+        String gioiTinh = rs.getBoolean("gioiTinh") ? "Nam" : "Nữ";
 
         return new NhanVien(
-            rs.getString(COL_MA),
-            rs.getString(COL_TEN),
-            rs.getString(COL_DIA_CHI),
+            rs.getString("maNV"),
+            rs.getString("tenNV"),
+            rs.getString("diaChi"),
             ngay,
-            rs.getString(COL_GIOI),
-            rs.getString(COL_SDT),
-            rs.getString(COL_PASS),
-            rs.getBoolean(COL_QUAN_LY)
+            gioiTinh,
+            rs.getString("sdt"),
+            rs.getString("matKhau"),
+            rs.getBoolean("quanLy")
         );
     }
 }

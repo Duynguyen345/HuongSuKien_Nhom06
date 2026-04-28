@@ -22,10 +22,10 @@ public class ConnectDB {
     //  ⚙️  CẤU HÌNH KẾT NỐI – chỉnh sửa cho phù hợp với hệ thống
     // ============================================================
     private static final String SERVER           = "localhost:1433";
-    private static final String DATABASE         = "HSK_DB";
+    private static final String DATABASE         = "quanlycuahangtienloi";
     private static final String USERNAME         = "sa";
-    private static final String PASSWORD         = "sapassword";
-    private static final boolean USE_WINDOWS_AUTH = false;  // true = dùng Windows Auth
+    private static final String PASSWORD         = "123456";
+    private static final boolean USE_WINDOWS_AUTH = false;    // SQL Auth, không cần sqljdbc_auth.dll
     // ============================================================
 
     private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
@@ -51,16 +51,16 @@ public class ConnectDB {
 
         String url;
         if (USE_WINDOWS_AUTH) {
-            // Windows Authentication – không cần user/pass
             url = String.format(
-                "jdbc:sqlserver://%s;databaseName=%s;integratedSecurity=true;",
+                "jdbc:sqlserver://%s;databaseName=%s;integratedSecurity=true;"
+                + "encrypt=false;trustServerCertificate=true;",
                 SERVER, DATABASE
             );
             return DriverManager.getConnection(url);
         } else {
-            // SQL Server Authentication
             url = String.format(
-                "jdbc:sqlserver://%s;databaseName=%s;",
+                "jdbc:sqlserver://%s;databaseName=%s;"
+                + "encrypt=false;trustServerCertificate=true;",
                 SERVER, DATABASE
             );
             return DriverManager.getConnection(url, USERNAME, PASSWORD);
