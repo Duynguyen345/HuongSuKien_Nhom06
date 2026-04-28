@@ -7,46 +7,42 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseListener {
+public class QuanLyNhanVienPanel extends JPanel implements ActionListener, MouseListener {
 
-    // ── DAO ──────────────────────────────────────────────────────
+    // ── DAO & định dạng ngày ────────────────────────────────────
     private final NHANVIEN_DAO dao = new NHANVIEN_DAO();
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     // ── Components ───────────────────────────────────────────────
-    private JTextField txtMaNV, txtTenNV, txtDiaChi, txtSdt, txtNgayVaoLam, txtTimKiem;
+    private JTextField     txtMaNV, txtTenNV, txtDiaChi, txtSdt, txtNgayVaoLam, txtTimKiem;
     private JPasswordField txtMatKhau;
     private JComboBox<String> cbGioiTinh, cbVaiTro;
-    private CustomButton btnThem, btnXoa, btnSua, btnXoaTrang, btnTimKiem;
-    private JTable table;
+    private CustomButton   btnThem, btnXoa, btnSua, btnXoaTrang, btnTimKiem;
+    private JTable         table;
     private DefaultTableModel tableModel;
 
-    public QuanLyNhanVien_GUI() {
+    public QuanLyNhanVienPanel() {
         setLayout(new BorderLayout(10, 10));
         setBackground(new Color(240, 244, 248));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // 1. Tiêu đề
+        // ─── Tiêu đề ──────────────────────────────────────────
         JLabel lblTitle = new JLabel("QUẢN LÝ NHÂN VIÊN", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 26));
         lblTitle.setForeground(new Color(44, 62, 80));
         lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 
-        // 2. Main Content (Top: Form + Buttons)
+        // ─── Form nhập liệu ────────────────────────────────────
         JPanel pnlTop = new JPanel(new BorderLayout(10, 10));
         pnlTop.setOpaque(false);
 
-        // -- 2.1 Form Input --
         JPanel pnlForm = new JPanel(new GridLayout(4, 4, 15, 15));
         pnlForm.setBackground(Color.WHITE);
         pnlForm.setBorder(BorderFactory.createCompoundBorder(
@@ -58,46 +54,44 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
             BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
 
-        // Dòng 1
-        pnlForm.add(makeLabel("Mã nhân viên:"));
+        // Dòng 1: Mã NV | Tên NV
+        pnlForm.add(lbl("Mã nhân viên:"));
         pnlForm.add(txtMaNV = new JTextField());
-        pnlForm.add(makeLabel("Tên nhân viên:"));
+        pnlForm.add(lbl("Tên nhân viên:"));
         pnlForm.add(txtTenNV = new JTextField());
 
-        // Dòng 2
-        pnlForm.add(makeLabel("Giới tính:"));
+        // Dòng 2: Giới tính | Ngày vào làm
+        pnlForm.add(lbl("Giới tính:"));
         pnlForm.add(cbGioiTinh = new JComboBox<>(new String[]{"Nam", "Nữ"}));
         cbGioiTinh.setBackground(Color.WHITE);
-        pnlForm.add(makeLabel("Ngày vào làm (yyyy-MM-dd):"));
+        pnlForm.add(lbl("Ngày vào làm (yyyy-MM-dd):"));
         pnlForm.add(txtNgayVaoLam = new JTextField());
 
-        // Dòng 3
-        pnlForm.add(makeLabel("Số điện thoại:"));
+        // Dòng 3: SĐT | Vai trò
+        pnlForm.add(lbl("Số điện thoại:"));
         pnlForm.add(txtSdt = new JTextField());
-        pnlForm.add(makeLabel("Vai trò:"));
+        pnlForm.add(lbl("Vai trò:"));
         pnlForm.add(cbVaiTro = new JComboBox<>(new String[]{"Quản lý", "Nhân viên thu ngân"}));
         cbVaiTro.setBackground(Color.WHITE);
 
-        // Dòng 4
-        pnlForm.add(makeLabel("Mật khẩu:"));
+        // Dòng 4: Mật khẩu | Địa chỉ
+        pnlForm.add(lbl("Mật khẩu:"));
         pnlForm.add(txtMatKhau = new JPasswordField());
-        pnlForm.add(makeLabel("Địa chỉ:"));
+        pnlForm.add(lbl("Địa chỉ:"));
         pnlForm.add(txtDiaChi = new JTextField());
 
         pnlTop.add(pnlForm, BorderLayout.CENTER);
 
-        // -- 2.2 Buttons & Search --
+        // ─── Thanh nút + Tìm kiếm ─────────────────────────────
         JPanel pnlAction = new JPanel(new BorderLayout(10, 10));
         pnlAction.setOpaque(false);
 
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         pnlButtons.setOpaque(false);
-
-        btnThem     = makeButton("Thêm",      new Color(46, 204, 113));
-        btnXoa      = makeButton("Xóa",       new Color(231, 76, 60));
-        btnSua      = makeButton("Sửa",       new Color(52, 152, 219));
-        btnXoaTrang = makeButton("Xóa trắng", new Color(149, 165, 166));
-
+        btnThem     = makeBtn("Thêm",      new Color(46, 204, 113));
+        btnXoa      = makeBtn("Xóa",       new Color(231, 76, 60));
+        btnSua      = makeBtn("Sửa",       new Color(52, 152, 219));
+        btnXoaTrang = makeBtn("Xóa trắng", new Color(149, 165, 166));
         pnlButtons.add(btnThem);
         pnlButtons.add(btnXoa);
         pnlButtons.add(btnSua);
@@ -105,42 +99,39 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
 
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         pnlSearch.setOpaque(false);
-        JLabel lblSearch = new JLabel("Tìm theo mã/tên:");
+        JLabel lblSearch = new JLabel("Tìm theo mã / tên:");
         lblSearch.setFont(new Font("Segoe UI", Font.BOLD, 13));
         pnlSearch.add(lblSearch);
-
         txtTimKiem = new JTextField(12);
         txtTimKiem.setPreferredSize(new Dimension(150, 35));
         pnlSearch.add(txtTimKiem);
-
-        btnTimKiem = makeButton("Tìm kiếm", new Color(241, 196, 15));
+        btnTimKiem = makeBtn("Tìm kiếm", new Color(241, 196, 15));
         pnlSearch.add(btnTimKiem);
 
         pnlAction.add(pnlButtons, BorderLayout.WEST);
         pnlAction.add(pnlSearch,  BorderLayout.EAST);
         pnlTop.add(pnlAction, BorderLayout.SOUTH);
 
-        // Wrap
         JPanel pnlNorthWrap = new JPanel(new BorderLayout());
         pnlNorthWrap.setOpaque(false);
         pnlNorthWrap.add(lblTitle, BorderLayout.NORTH);
         pnlNorthWrap.add(pnlTop,   BorderLayout.CENTER);
         add(pnlNorthWrap, BorderLayout.NORTH);
 
-        // 3. Table
-        String[] columns = {"Mã NV", "Tên NV", "Giới tính", "SĐT", "Ngày vào làm", "Vai trò", "Địa chỉ"};
-        tableModel = new DefaultTableModel(columns, 0) {
+        // ─── Bảng danh sách ───────────────────────────────────
+        String[] cols = {"Mã NV", "Tên NV", "Giới tính", "SĐT", "Ngày vào làm", "Vai trò", "Địa chỉ"};
+        tableModel = new DefaultTableModel(cols, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
         table = new JTable(tableModel);
         table.setRowHeight(28);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(200, 215, 230));
         table.getTableHeader().setOpaque(false);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setSelectionBackground(new Color(52, 152, 219));
         table.setSelectionForeground(Color.WHITE);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createTitledBorder(
@@ -151,7 +142,7 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
         scrollPane.getViewport().setBackground(Color.WHITE);
         add(scrollPane, BorderLayout.CENTER);
 
-        // 4. Đăng ký sự kiện
+        // ─── Đăng ký sự kiện ──────────────────────────────────
         btnThem.addActionListener(this);
         btnXoa.addActionListener(this);
         btnSua.addActionListener(this);
@@ -159,12 +150,12 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
         btnTimKiem.addActionListener(this);
         table.addMouseListener(this);
 
-        // 5. Tải dữ liệu ban đầu
+        // ─── Tải dữ liệu ban đầu ──────────────────────────────
         taiDanhSach(null);
     }
 
     // ════════════════════════════════════════════════════════════
-    //  XỬ LÝ SỰ KIỆN
+    //  XỬ LÝ SỰ KIỆN BUTTON
     // ════════════════════════════════════════════════════════════
 
     @Override
@@ -177,14 +168,17 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
         else if (src == btnTimKiem)  timKiem();
     }
 
-    // ── Thêm nhân viên ──────────────────────────────────────────
+    // ── THÊM ────────────────────────────────────────────────────
     private void them() {
         NhanVien nv = docForm();
         if (nv == null) return;
 
+        String mk = new String(txtMatKhau.getPassword()).trim();
+        if (mk.isEmpty()) { showErr("Mật khẩu không được để trống khi thêm mới!"); return; }
+
         try {
             if (dao.tonTai(nv.getMaNV())) {
-                showError("Mã nhân viên \"" + nv.getMaNV() + "\" đã tồn tại!");
+                showErr("Mã nhân viên \"" + nv.getMaNV() + "\" đã tồn tại!");
                 return;
             }
             if (dao.them(nv)) {
@@ -192,128 +186,118 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
                 xoaTrang();
                 taiDanhSach(null);
             } else {
-                showError("Thêm thất bại, vui lòng thử lại.");
+                showErr("Thêm thất bại, vui lòng thử lại.");
             }
         } catch (SQLException ex) {
-            showError("Lỗi cơ sở dữ liệu:\n" + ex.getMessage());
+            showErr("Lỗi cơ sở dữ liệu:\n" + ex.getMessage());
         }
     }
 
-    // ── Xóa nhân viên ───────────────────────────────────────────
+    // ── XÓA ─────────────────────────────────────────────────────
     private void xoa() {
         String maNV = txtMaNV.getText().trim();
         if (maNV.isEmpty()) {
-            showError("Vui lòng chọn nhân viên cần xóa từ bảng!");
+            showErr("Vui lòng chọn một nhân viên từ bảng để xóa!");
             return;
         }
-
-        int confirm = JOptionPane.showConfirmDialog(
-            this,
-            "Xác nhận xóa nhân viên \"" + maNV + "\"?\n(Không thể hoàn tác nếu nhân viên không có hóa đơn liên kết)",
-            "Xác nhận xóa",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE
-        );
-        if (confirm != JOptionPane.YES_OPTION) return;
+        int ok = JOptionPane.showConfirmDialog(this,
+            "Xác nhận xóa nhân viên \"" + maNV + "\"?",
+            "Xác nhận xóa", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (ok != JOptionPane.YES_OPTION) return;
 
         try {
             if (dao.xoa(maNV)) {
-                showInfo("Đã xóa nhân viên \"" + maNV + "\" thành công.");
+                showInfo("Đã xóa nhân viên \"" + maNV + "\".");
                 xoaTrang();
                 taiDanhSach(null);
             } else {
-                showError("Không tìm thấy nhân viên để xóa.");
+                showErr("Không tìm thấy nhân viên để xóa.");
             }
         } catch (SQLException ex) {
-            // Bắt lỗi FK (nhân viên đã có hóa đơn)
-            if (ex.getMessage() != null && ex.getMessage().contains("FK_")) {
-                showError("Không thể xóa! Nhân viên này đã có hóa đơn liên kết.");
-            } else {
-                showError("Lỗi cơ sở dữ liệu:\n" + ex.getMessage());
-            }
+            if (ex.getMessage() != null && ex.getMessage().contains("FK_"))
+                showErr("Không thể xóa! Nhân viên đã có hóa đơn liên kết.");
+            else
+                showErr("Lỗi cơ sở dữ liệu:\n" + ex.getMessage());
         }
     }
 
-    // ── Sửa nhân viên ───────────────────────────────────────────
+    // ── SỬA ─────────────────────────────────────────────────────
     private void sua() {
         NhanVien nv = docForm();
         if (nv == null) return;
 
         try {
             if (!dao.tonTai(nv.getMaNV())) {
-                showError("Không tìm thấy nhân viên \"" + nv.getMaNV() + "\"!");
+                showErr("Không tìm thấy nhân viên \"" + nv.getMaNV() + "\"!");
                 return;
             }
-            // Nếu mật khẩu để trống → giữ nguyên mật khẩu cũ
+            // Nếu để trống mật khẩu → giữ nguyên mật khẩu cũ
             String mk = new String(txtMatKhau.getPassword()).trim();
             if (mk.isEmpty()) {
                 NhanVien cu = dao.timTheoMa(nv.getMaNV());
                 if (cu != null) nv.setMatKhau(cu.getMatKhau());
             }
-
             if (dao.capNhat(nv)) {
-                showInfo("Cập nhật nhân viên thành công!");
+                showInfo("Cập nhật thành công!");
                 xoaTrang();
                 taiDanhSach(null);
             } else {
-                showError("Cập nhật thất bại, vui lòng thử lại.");
+                showErr("Cập nhật thất bại, vui lòng thử lại.");
             }
         } catch (SQLException ex) {
-            showError("Lỗi cơ sở dữ liệu:\n" + ex.getMessage());
+            showErr("Lỗi cơ sở dữ liệu:\n" + ex.getMessage());
         }
     }
 
-    // ── Tìm kiếm ────────────────────────────────────────────────
+    // ── TÌM KIẾM ────────────────────────────────────────────────
     private void timKiem() {
         taiDanhSach(txtTimKiem.getText().trim());
     }
 
     // ════════════════════════════════════════════════════════════
-    //  HELPER METHODS
+    //  HELPERS
     // ════════════════════════════════════════════════════════════
 
-    /** Đọc dữ liệu từ form, validate và trả về NhanVien. Null nếu lỗi. */
+    /** Đọc & validate form → NhanVien. Trả null nếu lỗi. */
     private NhanVien docForm() {
-        String maNV  = txtMaNV.getText().trim();
-        String tenNV = txtTenNV.getText().trim();
-        String sdt   = txtSdt.getText().trim();
-        String ngay  = txtNgayVaoLam.getText().trim();
-        String mk    = new String(txtMatKhau.getPassword()).trim();
+        String maNV   = txtMaNV.getText().trim();
+        String tenNV  = txtTenNV.getText().trim();
+        String sdt    = txtSdt.getText().trim();
+        String ngay   = txtNgayVaoLam.getText().trim();
+        String mk     = new String(txtMatKhau.getPassword()).trim();
         String diaChi = txtDiaChi.getText().trim();
 
-        if (maNV.isEmpty()) { showError("Mã nhân viên không được để trống!"); return null; }
-        if (tenNV.isEmpty()) { showError("Tên nhân viên không được để trống!"); return null; }
-        if (sdt.isEmpty())  { showError("Số điện thoại không được để trống!"); return null; }
-        if (!sdt.matches("\\d{9,15}")) { showError("Số điện thoại chỉ được chứa chữ số (9-15 ký tự)!"); return null; }
-        if (ngay.isEmpty()) { showError("Ngày vào làm không được để trống!"); return null; }
+        if (maNV.isEmpty())  { showErr("Mã nhân viên không được để trống!");   return null; }
+        if (tenNV.isEmpty()) { showErr("Tên nhân viên không được để trống!");   return null; }
+        if (sdt.isEmpty())   { showErr("Số điện thoại không được để trống!");  return null; }
+        if (!sdt.matches("\\d{9,15}")) {
+            showErr("Số điện thoại chỉ gồm chữ số (9-15 ký tự)!"); return null;
+        }
+        if (ngay.isEmpty())  { showErr("Ngày vào làm không được để trống!");   return null; }
 
         LocalDate ngayVaoLam;
         try {
             ngayVaoLam = LocalDate.parse(ngay, DATE_FMT);
         } catch (DateTimeParseException ex) {
-            showError("Định dạng ngày không hợp lệ!\nVui lòng nhập theo dạng: yyyy-MM-dd (VD: 2024-01-15)");
+            showErr("Ngày không hợp lệ!\nVui lòng nhập theo dạng: yyyy-MM-dd  (VD: 2024-01-15)");
             return null;
         }
-
         if (ngayVaoLam.isAfter(LocalDate.now())) {
-            showError("Ngày vào làm không được lớn hơn ngày hiện tại!");
-            return null;
+            showErr("Ngày vào làm không được lớn hơn ngày hôm nay!"); return null;
         }
 
-        String gioiTinh = (String) cbGioiTinh.getSelectedItem();
-        boolean quanLy  = "Quản lý".equals(cbVaiTro.getSelectedItem());
-
+        String  gioiTinh = (String) cbGioiTinh.getSelectedItem();
+        boolean quanLy   = "Quản lý".equals(cbVaiTro.getSelectedItem());
         return new NhanVien(maNV, tenNV, diaChi, ngayVaoLam, gioiTinh, sdt, mk, quanLy);
     }
 
-    /** Tải danh sách nhân viên vào bảng. keyword=null → lấy tất cả. */
+    /** Load danh sách lên bảng. keyword = null → lấy tất cả. */
     private void taiDanhSach(String keyword) {
         tableModel.setRowCount(0);
         try {
             List<NhanVien> list = (keyword == null || keyword.isEmpty())
                     ? dao.layTatCa()
                     : dao.timKiem(keyword);
-
             for (NhanVien nv : list) {
                 tableModel.addRow(new Object[]{
                     nv.getMaNV(),
@@ -326,7 +310,7 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
                 });
             }
         } catch (SQLException ex) {
-            showError("Không thể tải dữ liệu:\n" + ex.getMessage());
+            showErr("Không thể tải dữ liệu:\n" + ex.getMessage());
         }
     }
 
@@ -345,7 +329,7 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
         txtMaNV.requestFocus();
     }
 
-    private CustomButton makeButton(String text, Color bg) {
+    private CustomButton makeBtn(String text, Color bg) {
         CustomButton btn = new CustomButton(text, bg, Color.WHITE);
         btn.setHorizontalAlignment(SwingConstants.CENTER);
         btn.setMargin(new Insets(0, 0, 0, 0));
@@ -353,24 +337,27 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
         return btn;
     }
 
-    private JLabel makeLabel(String text) {
-        JLabel lbl = new JLabel(text);
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        return lbl;
+    private JLabel lbl(String text) {
+        JLabel l = new JLabel(text);
+        l.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        return l;
     }
 
-    private void showInfo(String msg)  { JOptionPane.showMessageDialog(this, msg, "Thông báo", JOptionPane.INFORMATION_MESSAGE); }
-    private void showError(String msg) { JOptionPane.showMessageDialog(this, msg, "Lỗi",       JOptionPane.ERROR_MESSAGE); }
+    private void showInfo(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    }
+    private void showErr(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Lỗi", JOptionPane.ERROR_MESSAGE);
+    }
 
     // ════════════════════════════════════════════════════════════
-    //  MOUSE EVENTS – click vào bảng → điền form
+    //  MOUSE – click hàng bảng → điền form
     // ════════════════════════════════════════════════════════════
 
     @Override
     public void mouseClicked(MouseEvent e) {
         int row = table.getSelectedRow();
         if (row < 0) return;
-
         txtMaNV.setText(tableModel.getValueAt(row, 0).toString());
         txtTenNV.setText(tableModel.getValueAt(row, 1).toString());
         cbGioiTinh.setSelectedItem(tableModel.getValueAt(row, 2).toString());
@@ -378,7 +365,7 @@ public class QuanLyNhanVien_GUI extends JPanel implements ActionListener, MouseL
         txtNgayVaoLam.setText(tableModel.getValueAt(row, 4).toString());
         cbVaiTro.setSelectedItem(tableModel.getValueAt(row, 5).toString());
         txtDiaChi.setText(tableModel.getValueAt(row, 6).toString());
-        txtMatKhau.setText(""); // không hiển thị mật khẩu cũ
+        txtMatKhau.setText(""); // không hiện mật khẩu cũ
     }
 
     @Override public void mousePressed(MouseEvent e)  {}

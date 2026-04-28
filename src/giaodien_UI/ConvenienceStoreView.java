@@ -5,8 +5,13 @@ import model.NhanVien;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.*;
 import java.sql.SQLException;
+import dAO.HangHoa_DAO;
+import dAO.KhachHang_DAO;
+import model.*;
 
 public class ConvenienceStoreView extends JFrame {
 
@@ -216,20 +221,23 @@ public class ConvenienceStoreView extends JFrame {
 
     // ---------- CONTENT ----------
     private JPanel buildContent() {
-        cardLayout  = new CardLayout();
-        mainContent = new JPanel(cardLayout);
-        mainContent.setBackground(new Color(240, 244, 248));
+         cardLayout  = new CardLayout();
+         mainContent = new JPanel(cardLayout);
+         mainContent.setBackground(new Color(240, 244, 248));
 
-        mainContent.add(makePage("Quản lý Bán hàng"),  "BAN_HANG");
-        mainContent.add(makePage("Danh sách Hóa đơn"), "HOA_DON");
-        mainContent.add(makePage("Danh mục Sản phẩm"), "SAN_PHAM");
-        mainContent.add(makePage("Quản lý Lô hàng"),   "LO_HANG");
-        mainContent.add(makePage("Dữ liệu Khách hàng"),"KHACH_HANG");
-        mainContent.add(makePage("Báo cáo Thống kê"),  "THONG_KE");
-        mainContent.add(new QuanLyNhanVien_GUI(),      "NHAN_VIEN");
+        
+         FrmBanHang banHangPanel = new FrmBanHang();
+         if (currentUser != null) banHangPanel.maNVHienTai = currentUser.getMaNV();
+         mainContent.add(banHangPanel, "BAN_HANG");
+         mainContent.add(new HoaDonPanel(), "HOA_DON");
+         mainContent.add(makePage("Danh mục Sản phẩm"), "SAN_PHAM");
+         mainContent.add(makePage("Quản lý Lô hàng"),   "LO_HANG");
+         mainContent.add(makePage("Dữ liệu Khách hàng"),"KHACH_HANG");
+         mainContent.add(makePage("Báo cáo Thống kê"),  "THONG_KE");
+         mainContent.add(new QuanLyNhanVienPanel(),      "NHAN_VIEN");
 
-        return mainContent;
-    }
+         return mainContent;
+     }
 
     // ---------- EVENTS ----------
     private void setupMenuEvents() {
