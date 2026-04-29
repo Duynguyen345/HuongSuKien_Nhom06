@@ -230,9 +230,11 @@ public class ConvenienceStoreView extends JFrame {
          if (currentUser != null) banHangPanel.maNVHienTai = currentUser.getMaNV();
          mainContent.add(banHangPanel, "BAN_HANG");
          mainContent.add(new HoaDonPanel(), "HOA_DON");
-         mainContent.add(makePage("Danh mục Sản phẩm"), "SAN_PHAM");
+      
+         mainContent.add(new HangHoaPanel(), "SAN_PHAM");
          mainContent.add(makePage("Quản lý Lô hàng"),   "LO_HANG");
-         mainContent.add(makePage("Dữ liệu Khách hàng"),"KHACH_HANG");
+         mainContent.add(new KhachHangPanel(),"KHACH_HANG");
+         
          mainContent.add(makePage("Báo cáo Thống kê"),  "THONG_KE");
          mainContent.add(new QuanLyNhanVienPanel(),      "NHAN_VIEN");
 

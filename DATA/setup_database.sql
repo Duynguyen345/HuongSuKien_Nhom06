@@ -7,11 +7,26 @@
 USE master;
 GO
 
+
+/*
 IF EXISTS (SELECT * FROM sys.databases WHERE name = 'quanlycuahangtienloi')
 BEGIN
     DROP DATABASE quanlycuahangtienloi;
 END
 GO
+*/
+
+IF EXISTS (SELECT * FROM sys.databases WHERE name = 'quanlycuahangtienloi')
+BEGIN
+    ALTER DATABASE quanlycuahangtienloi SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE quanlycuahangtienloi;
+END
+GO
+
+
+
+
+
 
 CREATE DATABASE quanlycuahangtienloi;
 GO
@@ -183,22 +198,55 @@ CREATE TABLE ChiTietHoaDon (
 GO
 
 -- ============================================================
--- DỮ LIỆU MẪU (Sử dụng N'...' cho tiếng Việt)
+-- DỮ LIỆU MẪU (Bản đầy đủ 20 sản phẩm cho Nhóm 11)
 -- ============================================================
+
+-- 1. Loại khách hàng
 INSERT INTO LoaiKhachHang VALUES ('DONG', N'Đồng', 0, 0), ('BAC', N'Bạc', 5, 1000), ('VANG', N'Vàng', 10, 5000);
+
+-- 2. Loại hàng hóa
 INSERT INTO LoaiHangHoa VALUES ('TP', N'Thực phẩm', N'Đồ ăn đóng gói'), ('DU', N'Đồ uống', N'Nước giải khát');
 
--- Dữ liệu mẫu nhân viên: gioiTinh BIT (1=Nam, 0=Nữ), quanLy BIT (1=Quản lý, 0=Thu ngân)
+-- 3. Nhân viên
 INSERT INTO NhanVien VALUES
     ('NV001', N'Nguyễn Tuấn Duy',   N'123 Lý Thường Kiệt, Q.10, TP.HCM', '2024-01-10', 1, '0901234501', '123456', 1),
     ('NV002', N'Trần Thị Bích Ngọc', N'45 Nguyễn Trãi, Q.1, TP.HCM',      '2024-03-15', 0, '0912345602', '123456', 0),
     ('NV003', N'Lê Văn Hùng',        N'78 Cách Mạng Tháng 8, Q.3, TP.HCM', '2025-06-01', 1, '0923456703', '123456', 0);
 
+-- 4. Khách hàng
 INSERT INTO KhachHang VALUES ('KH001', N'Trần Văn An', '0912345678', 1200, 'BAC');
-INSERT INTO HangHoa VALUES ('HH001', '8934588012345', N'Mì Hảo Hảo', NULL, 5500, 'TP', 1);
-INSERT INTO LoHang VALUES ('LO001', 'HH001', '2025-03-01', '2026-01-01', 200, 87);
-GO
 
+-- 5. Danh sách 20 Hàng hóa (Khớp với file ảnh trong Resource.HangHoa)
+INSERT INTO HangHoa (maHH, maVach, tenHH, hinhAnh, giaSP, maLoaiHang, conKinhDoanh) VALUES 
+('HH001', '8934588012345', N'Mì Hảo Hảo', 'haohao.jpg', 5500, 'TP', 1),
+('HH002', '89300002', N'Nước ngọt 7Up', '7up.jpg', 15000, 'DU', 1),
+('HH003', '89300003', N'Nước khoáng Aquafina', 'aquafina.jpg', 10000, 'DU', 1),
+('HH004', '89300004', N'Bánh su kem', 'Banhsukem.jpg', 25000, 'TP', 1),
+('HH005', '89300005', N'Bánh bông lan nhỏ', 'Bonglannho.jpg', 12000, 'TP', 1),
+('HH006', '89300006', N'Bông lan phô mai', 'Bonglanphomai.jpg', 45000, 'TP', 1),
+('HH007', '89300007', N'Nước ngọt Coca', 'coca.jpg', 15000, 'DU', 1),
+('HH008', '89300008', N'Sữa đậu nành Fami', 'fami.jpg', 7000, 'DU', 1),
+('HH009', '89300009', N'Bánh Hamburger', 'Hamburger.jpg', 35000, 'TP', 1),
+('HH010', '89300010', N'Hạt điều rang muối', 'hatdieu.jpg', 55000, 'TP', 1),
+('HH011', '89300011', N'Khoai tây Lays', 'khoaitaylays.jpg', 18000, 'TP', 1),
+('HH012', '89300012', N'Khô gà lá chanh', 'khogalachanh.jpg', 32000, 'TP', 1),
+('HH013', '89300013', N'Mirinda đá dưa', 'mirindadua.jpg', 12000, 'DU', 1),
+('HH014', '89300014', N'Mít sấy giòn', 'mitsay.jpg', 28000, 'TP', 1),
+('HH015', '89300015', N'Nước ngọt Pepsi', 'pepsi.jpg', 15000, 'DU', 1),
+('HH016', '89300016', N'Bánh Sandwich', 'Sandwich.jpg', 22000, 'TP', 1),
+('HH017', '89300017', N'Snack rong biển', 'snackrongbien.jpg', 14000, 'TP', 1),
+('HH018', '89300018', N'Nước ngọt Sprite', 'sprite.jpg', 15000, 'DU', 1),
+('HH019', '89300019', N'Nước tăng lực Sting', 'sting.jpg', 15000, 'DU', 1),
+('HH020', '89300020', N'Zero Soda', 'zerosoda.jpg', 18000, 'DU', 1);
+
+-- 6. Lô hàng (Cần có ít nhất 1 lô cho mỗi sản phẩm để hiện tồn kho)
+INSERT INTO LoHang VALUES ('LO001', 'HH001', '2025-03-01', '2026-01-01', 200, 87);
+INSERT INTO LoHang VALUES ('LO002', 'HH002', '2025-03-01', '2026-01-01', 100, 50);
+-- (Có thể thêm tiếp các LO003... nếu bạn muốn hiện tồn kho cho toàn bộ món)
+
+GO
+-- ============================================================
+-- VIEW (Bắt đầu từ đây...)
 -- ============================================================
 -- VIEW
 -- ============================================================

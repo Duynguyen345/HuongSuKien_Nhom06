@@ -247,7 +247,7 @@ public class FrmBanHang extends JPanel {
             khachHangHienTai = khDAO.timKhachHangTheoSDT(sdt);
             if (khachHangHienTai != null) {
                 lblTenKH.setText("Khách: " + khachHangHienTai.getTenKH());
-                lblGiamGiaKH.setText("Chiết khấu: " + khachHangHienTai.getLoaiKH().getGiamGia() + "%");
+                lblGiamGiaKH.setText("Chiết khấu: " + khachHangHienTai.getLoaiKhachHang().getGiamGia() + "%");
             } else {
                 lblTenKH.setText("Khách: Vãng lai");
                 lblGiamGiaKH.setText("Chiết khấu: 0%");
@@ -335,7 +335,7 @@ public class FrmBanHang extends JPanel {
     private void tinhTongTien() {
         double tamTinh = 0;
         for (int i = 0; i < modelGioHang.getRowCount(); i++) tamTinh += (double) modelGioHang.getValueAt(i, 5);
-        double giam = (khachHangHienTai != null) ? tamTinh * (khachHangHienTai.getLoaiKH().getGiamGia() / 100.0) : 0;
+        double giam = (khachHangHienTai != null) ? tamTinh * (khachHangHienTai.getLoaiKhachHang().getGiamGia() / 100.0) : 0;
         lblTongTien.setText("Tổng tạm tính: " + String.format("%,.0f", tamTinh) + " VNĐ");
         lblThanhTien.setText("THÀNH TIỀN: " + String.format("%,.0f", (tamTinh - giam)) + " VNĐ");
     }
@@ -361,7 +361,7 @@ public class FrmBanHang extends JPanel {
                 try { tamTinh += Double.parseDouble(v.toString()); } catch (Exception ex) { /* bỏ qua ngoại lệ nếu sai định dạng */ }
             }
         }
-        double giamGia = (khachHangHienTai != null) ? tamTinh * (khachHangHienTai.getLoaiKH().getGiamGia() / 100.0) : 0;
+        double giamGia = (khachHangHienTai != null) ? tamTinh * (khachHangHienTai.getLoaiKhachHang().getGiamGia() / 100.0) : 0;
         return tamTinh - giamGia;
     }
     
@@ -375,7 +375,7 @@ public class FrmBanHang extends JPanel {
                 try { tamTinh += Double.parseDouble(v.toString()); } catch (Exception ex) { /* bỏ qua ngoại lệ nếu sai định dạng */ }
             }
         }
-        return (khachHangHienTai != null) ? tamTinh * (khachHangHienTai.getLoaiKH().getGiamGia() / 100.0) : 0;
+        return (khachHangHienTai != null) ? tamTinh * (khachHangHienTai.getLoaiKhachHang().getGiamGia() / 100.0) : 0;
     }
 
     // ── THÊM MỚI: Tải danh sách hàng hóa từ DB vào bảng bên trái ──

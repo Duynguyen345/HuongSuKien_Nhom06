@@ -24,7 +24,7 @@ public class ConnectDB {
     private static final String SERVER           = "localhost:1433";
     private static final String DATABASE         = "quanlycuahangtienloi";
     private static final String USERNAME         = "sa";
-    private static final String PASSWORD         = "123456";
+    private static final String PASSWORD         = "sapassword";
     private static final boolean USE_WINDOWS_AUTH = false;    // SQL Auth, không cần sqljdbc_auth.dll
     // ============================================================
 
@@ -32,6 +32,27 @@ public class ConnectDB {
 
     /** Singleton connection – dùng chung toàn ứng dụng */
     private static Connection connection = null;
+    
+    
+    
+ // 1. Bổ sung biến instance để dùng Singleton
+    private static ConnectDB instance = new ConnectDB();
+
+    // 2. Bổ sung hàm getInstance() để file UI hết lỗi
+    public static ConnectDB getInstance() {
+        return instance;
+    }
+
+    // 3. Bổ sung hàm connect() để file UI gọi được
+    public void connect() throws SQLException {
+        getConnection(); // Hàm này sẽ tự động khởi tạo kết nối
+    }
+    
+    
+    
+    
+    
+    
 
     /** Trả về Connection đang mở; nếu chưa có hoặc đã đóng thì tạo mới. */
     public static Connection getConnection() throws SQLException {
