@@ -26,7 +26,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-// Đảm bảo import đúng đường dẫn package Model và DAO của bạn
+
 import dAO.KhachHang_DAO;
 import model.KhachHang;
 
@@ -123,7 +123,7 @@ public class KhachHangPanel extends JPanel {
         table.setGridColor(new Color(200, 200, 200));
         table.setShowGrid(true);
         
-        // Căn giữa tiêu đề và nội dung cột
+      
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         table.getTableHeader().setDefaultRenderer(centerRenderer);
@@ -161,7 +161,7 @@ public class KhachHangPanel extends JPanel {
         centerPanel.add(tableWrapper, BorderLayout.CENTER);
         add(centerPanel, BorderLayout.CENTER);
 
-        // --- CÁC NÚT CHỨC NĂNG ---
+   //nút chức năng
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         leftPanel.setBackground(new Color(245, 245, 245));
         leftPanel.setBorder(BorderFactory.createTitledBorder(
@@ -185,7 +185,7 @@ public class KhachHangPanel extends JPanel {
         btnXoaTrang.addActionListener(e -> xuLySuKienLamMoi());
         leftPanel.add(btnXoaTrang);
 
-        // --- TÌM KIẾM ---
+   //tìm kiếm
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
         rightPanel.setBackground(new Color(245, 245, 245));
         rightPanel.setBorder(BorderFactory.createTitledBorder(
@@ -212,7 +212,7 @@ public class KhachHangPanel extends JPanel {
         loadDataToTable();
     }
 
-    // --- CÁC HÀM TIỆN ÍCH TẠO UI ---
+ 
     private JLabel createLabel(String text, Font font) {
         JLabel label = new JLabel(text);
         label.setFont(font);
@@ -237,7 +237,7 @@ public class KhachHangPanel extends JPanel {
         return button;
     }
 
-    // --- CÁC HÀM XỬ LÝ NGHIỆP VỤ ---
+  
     private void loadDataToTable() {
         tableModel.setRowCount(0);
         for (KhachHang kh : dskh) {

@@ -10,10 +10,11 @@ import model.LoaiHangHoa;
 public class HangHoa_DAO {
 
 
-    // PHẦN DÀNH CHO BÁN HÀNG (FrmBanHang)
+   
 
-
+//frm bán hàng
     /** Tìm hàng hóa theo mã vạch để quét (Dùng trong FrmBanHang) */
+	
     public HangHoa timTheoMaVach(String maVach) {
         String sql = "SELECT * FROM HangHoa hh JOIN LoaiHangHoa lhh ON hh.maLoaiHang = lhh.maLoaiHang WHERE hh.maVach = ? AND hh.conKinhDoanh = 1";
         try (Connection con = ConnectDB.getConnection();
@@ -56,7 +57,8 @@ public class HangHoa_DAO {
     //  PHẦN DÀNH CHO QUẢN LÝ (HangHoaPanel)
  
 
-    /** Lấy toàn bộ hàng hóa đang kinh doanh (Dùng trong HangHoaPanel) */
+  
+    //Lấy toàn bộ hàng hóa 
     public List<HangHoa> getAllHangHoaForSanPhamPanel() {
         List<HangHoa> list = new ArrayList<>();
         String sql = "SELECT * FROM HangHoa hh JOIN LoaiHangHoa lhh ON hh.maLoaiHang = lhh.maLoaiHang WHERE hh.conKinhDoanh = 1 ORDER BY hh.tenHH";
@@ -72,7 +74,8 @@ public class HangHoa_DAO {
         return list;
     }
 
-    /** Lấy tên file ảnh theo mã (Dùng trong HangHoaPanel) */
+
+    //Lấy tên file ảnh theo mã dùng trong panel
     public String getHinhAnhByMa(String maHH) {
         String sql = "SELECT hinhAnh FROM HangHoa WHERE maHH = ?";
         try (Connection con = ConnectDB.getConnection();
@@ -85,7 +88,7 @@ public class HangHoa_DAO {
         return null;
     }
 
-    /** Thêm hàng hóa mới */
+   //them mới
     public boolean themHangHoa(HangHoa hh) {
         String sql = "INSERT INTO HangHoa (maHH, maVach, tenHH, hinhAnh, giaSP, maLoaiHang, conKinhDoanh) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = ConnectDB.getConnection();
@@ -102,7 +105,7 @@ public class HangHoa_DAO {
         return false;
     }
 
-    /** Cập nhật hàng hóa */
+  //cập nhật hàng hóa
     public boolean capNhatHangHoa(HangHoa hh) {
         String sql = "UPDATE HangHoa SET maVach = ?, tenHH = ?, hinhAnh = ?, giaSP = ?, maLoaiHang = ? WHERE maHH = ?";
         try (Connection con = ConnectDB.getConnection();
@@ -118,7 +121,7 @@ public class HangHoa_DAO {
         return false;
     }
 
-    /** Ngừng kinh doanh (Xóa mềm) */
+   //Xóa
     public boolean xoaHangHoa(String maHH) {
         String sql = "UPDATE HangHoa SET conKinhDoanh = 0 WHERE maHH = ?";
         try (Connection con = ConnectDB.getConnection();
@@ -129,7 +132,7 @@ public class HangHoa_DAO {
         return false;
     }
 
-    /** Tìm kiếm gần đúng theo tên */
+//tìm theo tên
     public List<HangHoa> timKiemHangHoa(String tuKhoa) {
         List<HangHoa> list = new ArrayList<>();
         String sql = "SELECT * FROM HangHoa hh JOIN LoaiHangHoa lhh ON hh.maLoaiHang = lhh.maLoaiHang WHERE hh.tenHH COLLATE Vietnamese_CI_AI LIKE ? AND hh.conKinhDoanh = 1";

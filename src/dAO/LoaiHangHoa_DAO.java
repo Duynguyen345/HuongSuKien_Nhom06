@@ -13,7 +13,7 @@ import model.LoaiHangHoa;
 
 public class LoaiHangHoa_DAO {
 
-    /** 1. Lấy toàn bộ danh sách loại hàng hóa để đưa vào ComboBox */
+	//Lấy toàn bộ danh sách để đưa vào combo
     public List<LoaiHangHoa> getAllLoaiHangHoa() {
         List<LoaiHangHoa> ds = new ArrayList<>();
         String sql = "SELECT * FROM LoaiHangHoa";
@@ -36,7 +36,7 @@ public class LoaiHangHoa_DAO {
         return ds;
     }
 
-    /** 2. Tìm mã loại hàng khi biết tên (Dùng khi lưu Hàng Hóa mới) */
+    // 2. Tìm mã loại hàng khi biết tên 
     public String getMaLoaiHangByTen(String tenLoai) {
         String sql = "SELECT maLoaiHang FROM LoaiHangHoa WHERE tenLoaiHang = ?";
         try (Connection con = ConnectDB.getConnection();
@@ -54,7 +54,7 @@ public class LoaiHangHoa_DAO {
         return null;
     }
 
-    /** 3. Tìm đối tượng LoaiHangHoa khi biết mã */
+    // 3Tìm đối tượng LoaiHangHoa khi biết mã 
     public LoaiHangHoa getLoaiHangHoaByMa(String ma) {
         String sql = "SELECT * FROM LoaiHangHoa WHERE maLoaiHang = ?";
         try (Connection con = ConnectDB.getConnection();

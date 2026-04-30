@@ -8,7 +8,7 @@ import model.LoaiKhachHang;
 
 public class KhachHang_DAO {
 
-    // 1. Tìm 1 khách hàng theo số điện thoại (Chính xác)
+    // 1. Tìm 1 khách hàng theo số điện thoại 
     public KhachHang timKhachHangTheoSDT(String sdt) {
         KhachHang kh = null;
         String sql = "SELECT k.*, l.tenLKH, l.giamGia, l.mucDiem FROM KhachHang k " +
@@ -73,7 +73,7 @@ public class KhachHang_DAO {
         return dsKhachHang;
     }
 
-    // 3. Tìm khách hàng theo SĐT (Tìm kiếm gần đúng)
+    // 3. Tìm khách hàng theo SĐT 
     public ArrayList<KhachHang> timDanhSachKhachHangTheoSDT(String sdt) {
         ArrayList<KhachHang> dsKhachHang = new ArrayList<>();
         String sql = "SELECT k.*, l.tenLKH, l.giamGia, l.mucDiem FROM KhachHang k " +
@@ -109,17 +109,17 @@ public class KhachHang_DAO {
 
  // 4. Thêm khách hàng mới
     public boolean themKhachHang(KhachHang kh) {
-        // Chú ý: Đã bổ sung maKH vào cột và dấu ? vào VALUES
+       
         String sql = "INSERT INTO KhachHang (maKH, tenKH, soDienThoai, diemTL, maLKH) VALUES (?, ?, ?, ?, ?)";
         
         try (Connection con = ConnectDB.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             
-            stmt.setString(1, kh.getMaKH());      // Gắn cái mã vừa sinh ở Panel vào đây
+            stmt.setString(1, kh.getMaKH());   
             stmt.setString(2, kh.getTenKH());
             stmt.setString(3, kh.getSoDienThoai());
             stmt.setInt(4, kh.getDiemTL());
-            // Mặc định khách mới vào sẽ có hạng 'DONG'
+        
             stmt.setString(5, kh.getLoaiKhachHang() != null ? kh.getLoaiKhachHang().getMaLKH() : "DONG");
 
             int n = stmt.executeUpdate();

@@ -69,7 +69,7 @@ public class HangHoaPanel extends JPanel {
 	private void initUI() {
 		setLayout(new BorderLayout());
 
-		// ================= PHẦN CENTER: BẢNG DỮ LIỆU =================
+	//bảng dữ liệu
 		JPanel tablePanel = new JPanel(new BorderLayout());
 		tablePanel.setBackground(new Color(240, 242, 245));
 		
@@ -259,7 +259,7 @@ public class HangHoaPanel extends JPanel {
 	}
 
 	private void loadData() {
-		// Đã sửa lỗi chính tả ở đây: getAllHangHoaorSanPhamPanel -> getAllHangHoaForSanPhamPanel
+	
 		dsHH = hangHoaDAO.getAllHangHoaForSanPhamPanel();
 		reloadData();
 	}
@@ -360,11 +360,11 @@ public class HangHoaPanel extends JPanel {
 	private ImageIcon createImageIcon(String fileName, int width, int height) {
 	    try {
 	        if (fileName != null && !fileName.trim().isEmpty()) {
-	            // Đường dẫn này phải khớp 100% với tên package (Resource viết hoa chữ R)
+	        
 	            java.net.URL imgURL = getClass().getResource("/Resource/HangHoa/" + fileName);
 	            if (imgURL != null) {
 	                ImageIcon icon = new ImageIcon(imgURL);
-	                // Scale ảnh cho vừa khít ô trong bảng
+	             
 	                Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
 	                return new ImageIcon(scaledImage);
 	            }

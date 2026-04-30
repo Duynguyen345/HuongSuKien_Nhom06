@@ -19,7 +19,7 @@ public class LoaiKhachHang_DAO {
             while (rs.next()) {
                 String maLKH = rs.getString("maLKH");
                 String tenLKH = rs.getString("tenLKH");
-                // SQL là DECIMAL, Java lấy getInt nếu bạn chỉ dùng phần nguyên
+              
                 int giamGia = (int) rs.getDouble("giamGia"); 
                 int mucDiem = rs.getInt("mucDiem");
                 

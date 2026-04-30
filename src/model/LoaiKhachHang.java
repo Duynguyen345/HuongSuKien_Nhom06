@@ -1,10 +1,10 @@
 package model;
 
 public class LoaiKhachHang {
-    private String maLKH;          // Mã loại khách hàng (VD: DONG, BAC, VANG)
-    private String tenLKH;         // Tên loại (VD: Đồng, Bạc, Vàng)
-    private int giamGia;           // Phần trăm giảm giá (0 - 100)
-    private int mucDiem;           // Mức điểm tối thiểu để đạt loại này
+    private String maLKH;       
+    private String tenLKH;         
+    private int giamGia;        
+    private int mucDiem;           
 
     public LoaiKhachHang() {
     }
@@ -38,14 +38,14 @@ public class LoaiKhachHang {
         setMucDiem(mucDiem);
     }
     
-    // --- GETTER & SETTER ---
+  
 
     public String getMaLKH() {
         return maLKH;
     }
 
     public void setMaLKH(String maLKH) {
-        // Đã sửa: Cho phép nhập chuỗi bất kỳ (DONG, BAC, VANG...) nhưng không quá 10 ký tự (theo VARCHAR(10))
+     
         if(maLKH == null || maLKH.trim().isEmpty()) {
             throw new IllegalArgumentException("Mã loại khách hàng không được để trống.");
         }

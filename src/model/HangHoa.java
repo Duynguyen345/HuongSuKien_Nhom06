@@ -14,7 +14,7 @@ public class HangHoa {
     }
 
     public HangHoa(String maHH, String maVach, String tenHH, double giaSP, String hinhAnh, LoaiHangHoa loaiHangHoa, boolean conKinhDoanh) {
-        // Thay vì dùng this.maHH = maHH, ta gọi hàm set để nó kiểm tra lỗi luôn
+     
         setMaHH(maHH);
         setMaVach(maVach);
         setTenHH(tenHH);
