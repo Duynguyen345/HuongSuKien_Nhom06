@@ -2,8 +2,10 @@ package giaodien_UI;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.URL;
 
 import dAO.HangHoa_DAO;
 import dAO.KhachHang_DAO;
@@ -51,26 +53,33 @@ public class FrmBanHang extends JPanel {
         tblGioHang.setRowHeight(40);
         tblGioHang.setFont(new Font("Arial", Font.PLAIN, 15));
 
-        // Bảng danh sách hàng hóa từ DB
-        String[] colsSP = {"Mã hàng", "Tên sản phẩm", "Đơn giá"};
+        // Bảng danh sách hàng hóa từ DB (ĐÃ CẬP NHẬT CỘT HÌNH ẢNH)
+        String[] colsSP = {"Hình ảnh", "Mã vạch", "Tên sản phẩm", "Đơn giá"};
         modelSanPham = new DefaultTableModel(colsSP, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
         tblSanPham = new JTable(modelSanPham);
-        tblSanPham.setRowHeight(30);
+        tblSanPham.setRowHeight(80); // Chỉnh cao lên để hiển thị ảnh
         tblSanPham.setFont(new Font("Arial", Font.PLAIN, 13));
         tblSanPham.setSelectionBackground(new Color(52, 152, 219));
         tblSanPham.setSelectionForeground(Color.WHITE);
-        tblSanPham.getColumnModel().getColumn(0).setPreferredWidth(70);
-        tblSanPham.getColumnModel().getColumn(1).setPreferredWidth(200);
-        tblSanPham.getColumnModel().getColumn(2).setPreferredWidth(80);
+        
+        tblSanPham.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblSanPham.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tblSanPham.getColumnModel().getColumn(2).setPreferredWidth(150);
+        tblSanPham.getColumnModel().getColumn(3).setPreferredWidth(80);
+        
+        // Render hình ảnh cho cột 0
+        tblSanPham.getColumnModel().getColumn(0).setCellRenderer(new ImageRenderer());
+
         // Double-click → thêm vào giỏ (gọi lại themVaoGioHang đã có sẵn)
         tblSanPham.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int row = tblSanPham.getSelectedRow();
                     if (row >= 0) {
-                        String maVach = modelSanPham.getValueAt(row, 0).toString();
+                        // Cột 1 bây giờ là Mã vạch
+                        String maVach = modelSanPham.getValueAt(row, 1).toString();
                         HangHoa sp = hhDAO.timTheoMaVach(maVach);
                         if (sp == null) {
                             // Tìm theo maHH thay vì maVach
@@ -178,8 +187,8 @@ public class FrmBanHang extends JPanel {
     private void initIconsAndButtons() {
         // Khởi tạo các nút bấm
         btnThanhToan = new CustomButton("THANH TOÁN (F12)", new Color(255, 140, 0), Color.WHITE);
-        btnHuyDon     = new CustomButton("Hủy đơn hàng", new Color(153, 0, 0), Color.WHITE);
-        btnXoaDong    = new CustomButton("Xóa dòng chọn", new Color(0, 51, 102), Color.WHITE);
+        btnHuyDon     = new CustomButton("Hủy đơn hàng (ESC)", new Color(153, 0, 0), Color.WHITE);
+        btnXoaDong    = new CustomButton("Xóa dòng chọn (DEL)", new Color(0, 51, 102), Color.WHITE);
         
         // Hàm hỗ trợ: Tải và tự động thay đổi kích thước ảnh (Scale Icon)
         java.util.function.BiFunction<String, Integer, ImageIcon> loadScaled = (path, size) -> {
@@ -228,18 +237,46 @@ public class FrmBanHang extends JPanel {
     }
 
     private void xuLySuKien() {
+    	// 1. Theo dõi mọi thay đổi trong ô text (xem app điện thoại có bắn chữ vào không)
+        txtMaVach.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                System.out.println("DEBUG - Đang nhận dữ liệu: " + txtMaVach.getText());
+            }
+            @Override public void removeUpdate(javax.swing.event.DocumentEvent e) {}
+            @Override public void changedUpdate(javax.swing.event.DocumentEvent e) {}
+        });
+
+        // 2. Bắt sự kiện lệnh ENTER từ app điện thoại gửi tới
         txtMaVach.addActionListener(e -> {
             String barcode = txtMaVach.getText().trim();
-            // TEST: Thử nghiệm quét mã vạch (ví dụ: 8934567890123)
-            HangHoa sp = hhDAO.timTheoMaVach(barcode);
-            if (sp != null) {
-                themVaoGioHang(sp);
-                tinhTongTien();
-            } else {
-                JOptionPane.showMessageDialog(this, "Không tìm thấy mã sản phẩm: " + barcode);
+            System.out.println("========== BẮT ĐẦU QUÉT ==========");
+            System.out.println("Mã chốt nhận được: [" + barcode + "]");
+            
+            if (!barcode.isEmpty()) {
+                HangHoa sp = hhDAO.timTheoMaVach(barcode);
+                if (sp != null) {
+                    System.out.println("-> BINGO! Đã tìm thấy: " + sp.getTenHH());
+                    themVaoGioHang(sp);
+                    tinhTongTien();
+                } else {
+                    // Nếu không tìm thấy bằng mã vạch, thử tìm bằng Mã HH (backup)
+                    sp = hhDAO.timTheoMaHH(barcode);
+                    if (sp != null) {
+                        System.out.println("-> BINGO! Đã tìm thấy theo Mã HH: " + sp.getTenHH());
+                        themVaoGioHang(sp);
+                        tinhTongTien();
+                    } else {
+                        System.out.println("-> LỖI: DB không có mã này!");
+                        JOptionPane.showMessageDialog(this, 
+                            "Không tìm thấy mã sản phẩm: " + barcode, 
+                            "Lỗi quét mã", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                // Xóa trắng ô nhập và focus lại để sẵn sàng quét món tiếp theo
+                txtMaVach.setText("");
+                txtMaVach.requestFocus();
             }
-            txtMaVach.setText("");
-            txtMaVach.requestFocus();
         });
 
         txtSDT.addActionListener(e -> {
@@ -261,6 +298,21 @@ public class FrmBanHang extends JPanel {
                 modelGioHang.removeRow(row);
                 capNhatSTT();
                 tinhTongTien();
+            }
+        });
+        
+        btnHuyDon.addActionListener(e -> {
+            if(modelGioHang.getRowCount() > 0) {
+                int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn hủy đơn hàng này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+                if(confirm == JOptionPane.YES_OPTION) {
+                    modelGioHang.setRowCount(0);
+                    txtSDT.setText("");
+                    khachHangHienTai = null;
+                    lblTenKH.setText("Khách: Vãng lai");
+                    lblGiamGiaKH.setText("Chiết khấu: 0%");
+                    tinhTongTien();
+                    txtMaVach.requestFocus();
+                }
             }
         });
 
@@ -306,6 +358,7 @@ public class FrmBanHang extends JPanel {
                     lblTenKH.setText("Khách: Vãng lai");
                     lblGiamGiaKH.setText("Chiết khấu: 0%");
                     tinhTongTien();
+                    txtMaVach.requestFocus();
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "Giỏ hàng trống!");
@@ -314,9 +367,28 @@ public class FrmBanHang extends JPanel {
     }
 
     private void setupHotkeys() {
+        // F1 -> Nhập mã vạch
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), "focus");
         this.getActionMap().put("focus", new AbstractAction() {
             public void actionPerformed(ActionEvent e) { txtMaVach.requestFocus(); }
+        });
+        
+        // F12 -> Thanh toán
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0), "pay");
+        this.getActionMap().put("pay", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { btnThanhToan.doClick(); }
+        });
+        
+        // DELETE -> Xóa dòng
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteRow");
+        this.getActionMap().put("deleteRow", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { btnXoaDong.doClick(); }
+        });
+        
+        // ESCAPE -> Hủy đơn
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+        this.getActionMap().put("cancel", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { btnHuyDon.doClick(); }
         });
     }
 
@@ -343,14 +415,6 @@ public class FrmBanHang extends JPanel {
     private void capNhatSTT() {
         for (int i = 0; i < modelGioHang.getRowCount(); i++) modelGioHang.setValueAt(i + 1, i, 0);
     }
-
-    private void xuLyThanhToan() {
-        JOptionPane.showMessageDialog(this, "Thanh toán thành công!");
-        modelGioHang.setRowCount(0);
-        txtSDT.setText("");
-        khachHangHienTai = null;
-        tinhTongTien();
-    }
     
     public double tinhThanhTienSauGiam() {
         double tamTinh = 0;
@@ -365,7 +429,6 @@ public class FrmBanHang extends JPanel {
         return tamTinh - giamGia;
     }
     
-    // Phương thức hỗ trợ trả về riêng số tiền được giảm giá
     public double tinhTienGiam() {
         double tamTinh = 0;
         for (int i = 0; i < modelGioHang.getRowCount(); i++) {
@@ -378,16 +441,54 @@ public class FrmBanHang extends JPanel {
         return (khachHangHienTai != null) ? tamTinh * (khachHangHienTai.getLoaiKhachHang().getGiamGia() / 100.0) : 0;
     }
 
-    // ── THÊM MỚI: Tải danh sách hàng hóa từ DB vào bảng bên trái ──
+    // ── Tải danh sách hàng hóa từ DB và hiển thị kèm hình ảnh ──
     private void taiDanhSachSanPham() {
         modelSanPham.setRowCount(0);
         java.util.List<HangHoa> list = hhDAO.layTatCa();
         for (HangHoa h : list) {
+            // Load hình ảnh thu nhỏ
+            ImageIcon imageIcon = createImageIcon(h.getHinhAnh(), 60, 60);
             modelSanPham.addRow(new Object[]{
-                h.getMaHH(),
+                imageIcon,
+                h.getMaVach(),
                 h.getTenHH(),
                 String.format("%,.0f đ", h.getGiaSP())
             });
+        }
+    }
+    
+    // ── Hàm tiện ích hỗ trợ load ảnh ──
+    private ImageIcon createImageIcon(String fileName, int width, int height) {
+        try {
+            if (fileName != null && !fileName.trim().isEmpty()) {
+                URL imgURL = getClass().getResource("/Resource/HangHoa/" + fileName);
+                if (imgURL != null) {
+                    ImageIcon icon = new ImageIcon(imgURL);
+                    Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                    return new ImageIcon(scaledImage);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // ── Lớp hỗ trợ Render Hình ảnh trong bảng ──
+    class ImageRenderer extends JLabel implements TableCellRenderer {
+        private static final long serialVersionUID = 1L;
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setIcon((value instanceof ImageIcon) ? (ImageIcon) value : null);
+            setText((value instanceof ImageIcon) ? "" : "No Image");
+            setHorizontalAlignment(JLabel.CENTER);
+            if (isSelected) { 
+                setBackground(table.getSelectionBackground()); 
+                setOpaque(true); 
+            } else {
+                setOpaque(false);
+            }
+            return this;
         }
     }
 }
