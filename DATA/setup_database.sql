@@ -218,26 +218,26 @@ INSERT INTO KhachHang VALUES ('KH001', N'Trần Văn An', '0912345678', 1200, 'B
 
 -- 5. Danh sách 20 Hàng hóa (Khớp với file ảnh trong Resource.HangHoa)
 INSERT INTO HangHoa (maHH, maVach, tenHH, hinhAnh, giaSP, maLoaiHang, conKinhDoanh) VALUES 
-('HH001', '8934588012345', N'Mì Hảo Hảo', 'haohao.jpg', 5500, 'TP', 1),
-('HH002', '89300002', N'Nước ngọt 7Up', '7up.jpg', 15000, 'DU', 1),
-('HH003', '89300003', N'Nước khoáng Aquafina', 'aquafina.jpg', 10000, 'DU', 1),
-('HH004', '89300004', N'Bánh su kem', 'Banhsukem.jpg', 25000, 'TP', 1),
-('HH005', '89300005', N'Bánh bông lan nhỏ', 'Bonglannho.jpg', 12000, 'TP', 1),
-('HH006', '89300006', N'Bông lan phô mai', 'Bonglanphomai.jpg', 45000, 'TP', 1),
-('HH007', '89300007', N'Nước ngọt Coca', 'coca.jpg', 15000, 'DU', 1),
-('HH008', '89300008', N'Sữa đậu nành Fami', 'fami.jpg', 7000, 'DU', 1),
-('HH009', '89300009', N'Bánh Hamburger', 'Hamburger.jpg', 35000, 'TP', 1),
-('HH010', '89300010', N'Hạt điều rang muối', 'hatdieu.jpg', 55000, 'TP', 1),
-('HH011', '89300011', N'Khoai tây Lays', 'khoaitaylays.jpg', 18000, 'TP', 1),
-('HH012', '89300012', N'Khô gà lá chanh', 'khogalachanh.jpg', 32000, 'TP', 1),
-('HH013', '89300013', N'Mirinda đá dưa', 'mirindadua.jpg', 12000, 'DU', 1),
-('HH014', '89300014', N'Mít sấy giòn', 'mitsay.jpg', 28000, 'TP', 1),
-('HH015', '89300015', N'Nước ngọt Pepsi', 'pepsi.jpg', 15000, 'DU', 1),
-('HH016', '89300016', N'Bánh Sandwich', 'Sandwich.jpg', 22000, 'TP', 1),
-('HH017', '89300017', N'Snack rong biển', 'snackrongbien.jpg', 14000, 'TP', 1),
-('HH018', '89300018', N'Nước ngọt Sprite', 'sprite.jpg', 15000, 'DU', 1),
-('HH019', '89300019', N'Nước tăng lực Sting', 'sting.jpg', 15000, 'DU', 1),
-('HH020', '89300020', N'Zero Soda', 'zerosoda.jpg', 18000, 'DU', 1);
+('HH001', '8934588012345', N'Mì Hảo Hảo', 'haohao.png', 5500, 'TP', 1),
+('HH002', '89300002', N'Nước ngọt 7Up', '7up.png', 15000, 'DU', 1),
+('HH003', '89300003', N'Nước khoáng Aquafina', 'aquafina.png', 10000, 'DU', 1),
+('HH004', '89300004', N'Bánh su kem', 'Banhsukem.png', 25000, 'TP', 1),
+('HH005', '89300005', N'Bánh bông lan nhỏ', 'Bonglannho.png', 12000, 'TP', 1),
+('HH006', '89300006', N'Bông lan phô mai', 'Bonglanphomai.png', 45000, 'TP', 1),
+('HH007', '89300007', N'Nước ngọt Coca', 'coca.png', 15000, 'DU', 1),
+('HH008', '89300008', N'Sữa đậu nành Fami', 'fami.png', 7000, 'DU', 1),
+('HH009', '89300009', N'Bánh Hamburger', 'Hamburger.png', 35000, 'TP', 1),
+('HH010', '89300010', N'Hạt điều rang muối', 'hatdieu.png', 55000, 'TP', 1),
+('HH011', '89300011', N'Khoai tây Lays', 'khoaitaylays.png', 18000, 'TP', 1),
+('HH012', '89300012', N'Khô gà lá chanh', 'khogalachanh.png', 32000, 'TP', 1),
+('HH013', '89300013', N'Mirinda đá dưa', 'mirindadua.png', 12000, 'DU', 1),
+('HH014', '89300014', N'Mít sấy giòn', 'mitsay.png', 28000, 'TP', 1),
+('HH015', '89300015', N'Nước ngọt Pepsi', 'pepsi.png', 15000, 'DU', 1),
+('HH016', '89300016', N'Bánh Sandwich', 'Sandwich.png', 22000, 'TP', 1),
+('HH017', '89300017', N'Snack rong biển', 'snackrongbien.png', 14000, 'TP', 1),
+('HH018', '89300018', N'Nước ngọt Sprite', 'sprite.png', 15000, 'DU', 1),
+('HH019', '89300019', N'Nước tăng lực Sting', 'sting.png', 15000, 'DU', 1),
+('HH020', '89300020', N'Zero Soda', 'zerosoda.png', 18000, 'DU', 1);
 
 -- 6. Lô hàng (Cần có ít nhất 1 lô cho mỗi sản phẩm để hiện tồn kho)
 INSERT INTO LoHang VALUES ('LO001', 'HH001', '2025-03-01', '2026-01-01', 200, 87);
@@ -292,24 +292,68 @@ BEGIN
     ORDER BY maNV;
 END;
 GO
--- Thêm Hàng Hóa mới để test
-INSERT INTO HangHoa VALUES ('HH002', '8934588012346', N'Nước suối Aquafina', NULL, 5000, 'DU', 1);
-INSERT INTO HangHoa VALUES ('HH003', '8934588012347', N'Bánh mì ngọt', NULL, 12000, 'TP', 1);
+-- ============================================================
+-- Cập nhật mã vạch chuẩn Code-128 cho 20 sản phẩm 
+-- ============================================================
+USE quanlycuahangtienloi;
+GO
 
--- Thêm dữ liệu Lô Hàng (Phần test của bạn) để check số lượng nhập/tồn
-INSERT INTO LoHang VALUES ('LO002', 'HH002', '2025-04-01', '2026-04-01', 500, 450);
-INSERT INTO LoHang VALUES ('LO003', 'HH003', '2025-05-01', '2025-05-15', 50, 10);
-INSERT INTO LoHang VALUES ('LO004', 'HH001', '2025-04-20', '2025-12-31', 100, 100);
+-- Cập nhật mã vạch chuẩn EAN-13 cho 20 sản phẩm
+UPDATE HangHoa SET maVach = '8930000000010' WHERE maHH = 'HH001';
+UPDATE HangHoa SET maVach = '8930000000027' WHERE maHH = 'HH002';
+UPDATE HangHoa SET maVach = '8930000000034' WHERE maHH = 'HH003';
+UPDATE HangHoa SET maVach = '8930000000041' WHERE maHH = 'HH004';
+UPDATE HangHoa SET maVach = '8930000000058' WHERE maHH = 'HH005';
+UPDATE HangHoa SET maVach = '8930000000065' WHERE maHH = 'HH006';
+UPDATE HangHoa SET maVach = '8930000000072' WHERE maHH = 'HH007';
+UPDATE HangHoa SET maVach = '8930000000089' WHERE maHH = 'HH008';
+UPDATE HangHoa SET maVach = '8930000000096' WHERE maHH = 'HH009';
+UPDATE HangHoa SET maVach = '8930000000102' WHERE maHH = 'HH010';
+UPDATE HangHoa SET maVach = '8930000000119' WHERE maHH = 'HH011';
+UPDATE HangHoa SET maVach = '8930000000126' WHERE maHH = 'HH012';
+UPDATE HangHoa SET maVach = '8930000000133' WHERE maHH = 'HH013';
+UPDATE HangHoa SET maVach = '8930000000140' WHERE maHH = 'HH014';
+UPDATE HangHoa SET maVach = '8930000000157' WHERE maHH = 'HH015';
+UPDATE HangHoa SET maVach = '8930000000164' WHERE maHH = 'HH016';
+UPDATE HangHoa SET maVach = '8930000000171' WHERE maHH = 'HH017';
+UPDATE HangHoa SET maVach = '8930000000188' WHERE maHH = 'HH018';
+UPDATE HangHoa SET maVach = '8930000000195' WHERE maHH = 'HH019';
+UPDATE HangHoa SET maVach = '8930000000201' WHERE maHH = 'HH020';
+GO
+-- ============================================================
+-- Thêm đồng loạt 20 lô	hàng cho 20 sản phẩm 
+-- ============================================================
+USE quanlycuahangtienloi;
+GO
 
--- Thêm Hóa Đơn và Chi Tiết Hóa Đơn để code Java test được hàm Thống Kê Doanh Thu
-INSERT INTO HoaDonBanHang (maHDBH, ngayLapHDBH, maNV, hinhThucThanhToan, tongTienThanhToan)
-VALUES ('HD001', GETDATE(), 'NV001', 'TIEN_MAT', 55000);
+-- 1. Xóa dữ liệu các bảng phụ thuộc trước (xóa hóa đơn nháp để gỡ ràng buộc)
+DELETE FROM ChiTietHoaDon;
+DELETE FROM HoaDonBanHang;
 
-INSERT INTO ChiTietHoaDon (maHDBH, maLo, soLuong, donGia, thanhTien)
-VALUES ('HD001', 'LO001', 10, 5500, 55000);
+-- 2. Lúc này bảng LoHang đã được "tự do", có thể xóa sạch
+DELETE FROM LoHang;
+GO
 
-INSERT INTO HoaDonBanHang (maHDBH, ngayLapHDBH, maNV, hinhThucThanhToan, tongTienThanhToan)
-VALUES ('HD002', GETDATE(), 'NV002', 'CHUYEN_KHOAN', 100000);
-
-INSERT INTO ChiTietHoaDon (maHDBH, maLo, soLuong, donGia, thanhTien)
-VALUES ('HD002', 'LO002', 20, 5000, 100000);
+-- 3. Thêm đồng loạt 20 lô hàng cho 20 sản phẩm
+INSERT INTO LoHang (maLo, maHH, ngayNhap, hanSuDung, soLuongNhap, soLuongTon) VALUES 
+('LO001', 'HH001', '2025-04-01', '2026-04-01', 100, 100),
+('LO002', 'HH002', '2025-04-01', '2026-04-01', 100, 100),
+('LO003', 'HH003', '2025-04-01', '2026-04-01', 100, 100),
+('LO004', 'HH004', '2025-04-01', '2025-05-01', 100, 100),
+('LO005', 'HH005', '2025-04-01', '2025-05-01', 100, 100),
+('LO006', 'HH006', '2025-04-01', '2025-05-01', 100, 100),
+('LO007', 'HH007', '2025-04-01', '2026-04-01', 100, 100),
+('LO008', 'HH008', '2025-04-01', '2025-10-01', 100, 100),
+('LO009', 'HH009', '2025-04-01', '2025-04-15', 100, 100),
+('LO010', 'HH010', '2025-04-01', '2026-04-01', 100, 100),
+('LO011', 'HH011', '2025-04-01', '2026-04-01', 100, 100),
+('LO012', 'HH012', '2025-04-01', '2025-10-01', 100, 100),
+('LO013', 'HH013', '2025-04-01', '2026-04-01', 100, 100),
+('LO014', 'HH014', '2025-04-01', '2025-12-01', 100, 100),
+('LO015', 'HH015', '2025-04-01', '2026-04-01', 100, 100),
+('LO016', 'HH016', '2025-04-01', '2025-04-10', 100, 100),
+('LO017', 'HH017', '2025-04-01', '2026-04-01', 100, 100),
+('LO018', 'HH018', '2025-04-01', '2026-04-01', 100, 100),
+('LO019', 'HH019', '2025-04-01', '2026-04-01', 100, 100),
+('LO020', 'HH020', '2025-04-01', '2026-04-01', 100, 100);
+GO
