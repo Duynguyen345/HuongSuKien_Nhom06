@@ -24,7 +24,7 @@ public class ConnectDB {
     private static final String SERVER           = "localhost:1433";
     private static final String DATABASE         = "quanlycuahangtienloi";
     private static final String USERNAME         = "sa";
-    private static final String PASSWORD         = "sapassword";
+    private static final String PASSWORD         = "123456";
     private static final boolean USE_WINDOWS_AUTH = false;    // SQL Auth, không cần sqljdbc_auth.dll
     // ============================================================
 
@@ -73,15 +73,15 @@ public class ConnectDB {
         String url;
         if (USE_WINDOWS_AUTH) {
             url = String.format(
-            		"jdbc:sqlserver://localhost;instanceName=SQLEXPRESS;databaseName=quanlycuahangtienloi;encrypt=false;"
-            		+ "trustServerCertificate=true;",
+            		"jdbc:sqlserver://%s;databaseName=%s;integratedSecurity=true;"
+                            + "encrypt=false;trustServerCertificate=true;",
                 SERVER, DATABASE
             );
             return DriverManager.getConnection(url);
         } else {
             url = String.format(
-            		"jdbc:sqlserver://localhost;instanceName=SQLEXPRESS;databaseName=quanlycuahangtienloi;"
-            		+ "encrypt=false;trustServerCertificate=true;",
+            		"jdbc:sqlserver://%s;databaseName=%s;"
+                            + "encrypt=false;trustServerCertificate=true;",
                 SERVER, DATABASE
             );
             return DriverManager.getConnection(url, USERNAME, PASSWORD);

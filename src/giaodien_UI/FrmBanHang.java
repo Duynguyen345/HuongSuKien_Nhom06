@@ -65,7 +65,7 @@ public class FrmBanHang extends JPanel {
         tblSanPham.setSelectionForeground(Color.WHITE);
         
         tblSanPham.getColumnModel().getColumn(0).setPreferredWidth(80);
-        tblSanPham.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tblSanPham.getColumnModel().getColumn(1).setPreferredWidth(140);
         tblSanPham.getColumnModel().getColumn(2).setPreferredWidth(150);
         tblSanPham.getColumnModel().getColumn(3).setPreferredWidth(80);
         
@@ -460,16 +460,61 @@ public class FrmBanHang extends JPanel {
     // ── Hàm tiện ích hỗ trợ load ảnh ──
     private ImageIcon createImageIcon(String fileName, int width, int height) {
         try {
-            if (fileName != null && !fileName.trim().isEmpty()) {
-                URL imgURL = getClass().getResource("/Resource/HangHoa/" + fileName);
-                if (imgURL != null) {
-                    ImageIcon icon = new ImageIcon(imgURL);
-                    Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                    return new ImageIcon(scaledImage);
+            if (fileName == null || fileName.trim().isEmpty()) return null;
+            
+            // Xóa đuôi file cũ trong Database (.jpg, .png) để tự động tìm lại
+            String baseName = fileName;
+            if (baseName.lastIndexOf('.') > 0) {
+                baseName = baseName.substring(0, baseName.lastIndexOf('.'));
+            }
+
+            // Danh sách các thư mục phổ biến trên Eclipse/IntelliJ
+            String[] possibleFolders = {
+                "Resource/HangHoa/", 
+                "src/Resource/HangHoa/", 
+                "resources/HangHoa/", 
+                "src/resources/HangHoa/"
+            };
+            
+            // Tự động tìm cả PNG và JPG
+            String[] extensions = {".png", ".jpg", ".jpeg"};
+            
+            Image img = null;
+            
+            // 1. Tìm trong thư mục vật lý trước (Trị bách bệnh môi trường IDE)
+            for (String folder : possibleFolders) {
+                for (String ext : extensions) {
+                    java.io.File f = new java.io.File(folder + baseName + ext);
+                    if (f.exists()) {
+                        img = new ImageIcon(f.getAbsolutePath()).getImage();
+                        break;
+                    }
+                }
+                if (img != null) break;
+            }
+            
+            // 2. Nếu vẫn không thấy, thử dùng Classpath (Dành cho lúc build ra file .jar)
+            if (img == null) {
+                for (String ext : extensions) {
+                    URL imgURL = getClass().getResource("/Resource/HangHoa/" + baseName + ext);
+                    if (imgURL == null) imgURL = getClass().getResource("/resources/HangHoa/" + baseName + ext);
+                    if (imgURL != null) {
+                        img = new ImageIcon(imgURL).getImage();
+                        break;
+                    }
                 }
             }
+            
+            // 3. Xử lý kết quả
+            if (img != null) {
+                Image scaledImage = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                return new ImageIcon(scaledImage);
+            } else {
+                // In ra Console để Tuấn biết file nào bị thiếu thật sự
+                System.err.println("❌ CẢNH BÁO: Không tìm thấy file ảnh gốc cho [" + baseName + "]");
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Lỗi load ảnh " + fileName + ": " + e.getMessage());
         }
         return null;
     }

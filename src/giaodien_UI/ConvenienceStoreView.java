@@ -124,6 +124,12 @@ public class ConvenienceStoreView extends JFrame {
             btnKhachHang, btnThongKe, btnNhanVien
         };
         for (CustomButton btn : menuButtons) {
+            // Ẩn các nút chức năng nhạy cảm nếu tài khoản không phải là Quản lý
+            if (currentUser != null && !currentUser.isQuanLy()) {
+                if (btn == btnThongKe || btn == btnNhanVien || btn == btnLoHang) {
+                    continue;
+                }
+            }
             btn.setAlignmentX(Component.LEFT_ALIGNMENT);
             sidebar.add(btn);
             sidebar.add(Box.createRigidArea(new Dimension(0, 6)));
@@ -135,8 +141,8 @@ public class ConvenienceStoreView extends JFrame {
         sidebar.add(Box.createRigidArea(new Dimension(0, 12)));
 
         String displayName = (currentUser != null)
-                ? "👤  " + currentUser.getTenNV() + "  |  " + currentUser.getVaiTro()
-                : "👤  Admin  |  Nhân viên";
+                ? "" + currentUser.getTenNV() + "  |  " + currentUser.getVaiTro()
+                : "Admin  |  Nhân viên";
         JLabel user = new JLabel(displayName);
         user.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         user.setForeground(new Color(150, 180, 200));
@@ -160,21 +166,15 @@ public class ConvenienceStoreView extends JFrame {
         JPanel userInfo = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
         userInfo.setOpaque(false);
 
-        // Khung avatar trống (để tự thêm ảnh sau)
-        JPanel avatar = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(200, 215, 230));
-                g2.fillOval(0, 0, getWidth(), getHeight());
-                g2.setColor(new Color(150, 175, 200));
-                g2.setStroke(new BasicStroke(2));
-                g2.drawOval(1, 1, getWidth() - 2, getHeight() - 2);
-                g2.dispose();
-            }
-        };
+        // Khung avatar chứa logo XeHang_logo.png
+        JLabel avatar = new JLabel();
+        java.net.URL avatarUrl = getClass().getResource("/resources/XeHang_logo.png");
+        if (avatarUrl != null) {
+            ImageIcon icon = new ImageIcon(new ImageIcon(avatarUrl).getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH));
+            avatar.setIcon(icon);
+        } else {
+            avatar.setText("");
+        }
         avatar.setOpaque(false);
         avatar.setPreferredSize(new Dimension(40, 40));
 
@@ -232,10 +232,10 @@ public class ConvenienceStoreView extends JFrame {
          mainContent.add(new HoaDonPanel(), "HOA_DON");
       
          mainContent.add(new HangHoaPanel(), "SAN_PHAM");
-         mainContent.add(makePage("Quản lý Lô hàng"),   "LO_HANG");
+         mainContent.add(new QuanLyLoHangPanel(),   "LO_HANG");
          mainContent.add(new KhachHangPanel(),"KHACH_HANG");
          
-         mainContent.add(makePage("Báo cáo Thống kê"),  "THONG_KE");
+         mainContent.add(new ThongKePanel(),  "THONG_KE");
          mainContent.add(new QuanLyNhanVienPanel(),      "NHAN_VIEN");
 
          return mainContent;
@@ -258,6 +258,16 @@ public class ConvenienceStoreView extends JFrame {
     }
 
     private void showPage(CustomButton active, String key, String title) {
+        // Kiểm tra quyền truy cập vào các trang nhạy cảm
+        if (currentUser != null && !currentUser.isQuanLy()) {
+            if ("THONG_KE".equals(key) || "NHAN_VIEN".equals(key) || "LO_HANG".equals(key)) {
+                JOptionPane.showMessageDialog(this,
+                    "Chỉ tài khoản Quản lý mới có quyền truy cập chức năng này.",
+                    "Từ chối truy cập", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+
         for (CustomButton b : menuButtons) b.setActive(false);
         active.setActive(true);
         cardLayout.show(mainContent, key);

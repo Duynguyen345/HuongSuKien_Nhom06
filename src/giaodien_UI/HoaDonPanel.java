@@ -70,8 +70,8 @@ public class HoaDonPanel extends JPanel {
         txtTimKiem.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         txtTimKiem.putClientProperty("JTextField.placeholderText", "Mã hóa đơn / SĐT khách...");
 
-        JButton btnTimKiem = styled("🔍  Tìm kiếm", new Color(52, 152, 219));
-        JButton btnLamMoi  = styled("↺  Làm mới",   new Color(127, 140, 141));
+        JButton btnTimKiem = styled("Tìm kiếm", new Color(52, 152, 219));
+        JButton btnLamMoi  = styled("Làm mới",   new Color(127, 140, 141));
 
         row1.add(new JLabel("Tìm kiếm:"));
         row1.add(txtTimKiem);
@@ -189,7 +189,7 @@ public class HoaDonPanel extends JPanel {
         lblTomTat.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         lblTomTat.setForeground(Color.GRAY);
 
-        JButton btnIn = styled("🖨  In lại hóa đơn", new Color(142, 68, 173));
+        JButton btnIn = styled("In lại hóa đơn", new Color(142, 68, 173));
         btnIn.addActionListener(e -> inLaiHoaDon());
 
         p.add(lblTomTat, BorderLayout.CENTER);

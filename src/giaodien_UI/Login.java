@@ -21,29 +21,38 @@ public class Login extends JPanel {
         c.insets = new Insets(6, 0, 6, 0);
         c.gridx  = 0;
 
+        // Logo
+        java.net.URL logoUrl = getClass().getResource("/resources/XeHang_logo.png");
+        if (logoUrl != null) {
+            ImageIcon logoIcon = new ImageIcon(new ImageIcon(logoUrl).getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH));
+            JLabel lblLogo = new JLabel(logoIcon, SwingConstants.CENTER);
+            c.gridy = 0; c.insets = new Insets(0, 0, 10, 0);
+            add(lblLogo, c);
+        }
+
         // Tiêu đề
         JLabel title = new JLabel("Đăng nhập hệ thống", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 18));
         title.setForeground(new Color(33, 47, 61));
-        c.gridy = 0; c.insets = new Insets(0, 0, 20, 0);
+        c.gridy = 1; c.insets = new Insets(0, 0, 20, 0);
         add(title, c);
 
         // Mã nhân viên
-        c.gridy = 1; c.insets = new Insets(4, 0, 4, 0);
+        c.gridy = 2; c.insets = new Insets(4, 0, 4, 0);
         add(new JLabel("Mã nhân viên:"), c);
-        c.gridy = 2;
+        c.gridy = 3;
         add(txtUser, c);
 
         // Mật khẩu
-        c.gridy = 3;
-        add(new JLabel("Mật khẩu:"), c);
         c.gridy = 4;
+        add(new JLabel("Mật khẩu:"), c);
+        c.gridy = 5;
         add(txtPass, c);
 
         // Nút đăng nhập
         btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
         btnLogin.setPreferredSize(new Dimension(240, 38));
-        c.gridy = 5; c.insets = new Insets(16, 0, 0, 0);
+        c.gridy = 6; c.insets = new Insets(16, 0, 0, 0);
         add(btnLogin, c);
     }
 
