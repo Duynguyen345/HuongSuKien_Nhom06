@@ -73,15 +73,15 @@ public class ConnectDB {
         String url;
         if (USE_WINDOWS_AUTH) {
             url = String.format(
-                "jdbc:sqlserver://%s;databaseName=%s;integratedSecurity=true;"
-                + "encrypt=false;trustServerCertificate=true;",
+            		"jdbc:sqlserver://localhost;instanceName=SQLEXPRESS;databaseName=quanlycuahangtienloi;encrypt=false;"
+            		+ "trustServerCertificate=true;",
                 SERVER, DATABASE
             );
             return DriverManager.getConnection(url);
         } else {
             url = String.format(
-                "jdbc:sqlserver://%s;databaseName=%s;"
-                + "encrypt=false;trustServerCertificate=true;",
+            		"jdbc:sqlserver://localhost;instanceName=SQLEXPRESS;databaseName=quanlycuahangtienloi;"
+            		+ "encrypt=false;trustServerCertificate=true;",
                 SERVER, DATABASE
             );
             return DriverManager.getConnection(url, USERNAME, PASSWORD);

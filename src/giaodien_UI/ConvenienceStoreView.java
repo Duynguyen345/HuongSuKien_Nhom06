@@ -116,10 +116,7 @@ public class ConvenienceStoreView extends JFrame {
         btnSanPham   = makeMenuBtn("Sản phẩm",    btnColor);
         btnLoHang    = makeMenuBtn("Lô hàng",     btnColor);
         btnKhachHang = makeMenuBtn("Khách hàng",  btnColor);
-        
-        // Luong: Chỗ 1 - thêm nút menu (sau dòng btnLoHang = ...)
         btnThongKe   = makeMenuBtn("Thống kê",    btnColor);
-        
         btnNhanVien  = makeMenuBtn("Nhân viên",   btnColor);
 
         menuButtons = new CustomButton[]{
@@ -130,11 +127,6 @@ public class ConvenienceStoreView extends JFrame {
             btn.setAlignmentX(Component.LEFT_ALIGNMENT);
             sidebar.add(btn);
             sidebar.add(Box.createRigidArea(new Dimension(0, 6)));
-            
-            // Luong: Chỗ 2 - thêm vào sidebar và xử lý sự kiện
-            if(btn == btnThongKe) {
-                btnThongKe.addActionListener(e -> cardLayout.show(mainContent, "THONG_KE"));
-            }
         }
 
         // Đẩy thông tin user xuống dưới
@@ -238,13 +230,12 @@ public class ConvenienceStoreView extends JFrame {
          if (currentUser != null) banHangPanel.maNVHienTai = currentUser.getMaNV();
          mainContent.add(banHangPanel, "BAN_HANG");
          mainContent.add(new HoaDonPanel(), "HOA_DON");
-         mainContent.add(makePage("Danh mục Sản phẩm"), "SAN_PHAM");
-         mainContent.add(new QuanLyLoHangPanel(), "LO_HANG");
-         mainContent.add(makePage("Dữ liệu Khách hàng"),"KHACH_HANG");
+      
+         mainContent.add(new HangHoaPanel(), "SAN_PHAM");
+         mainContent.add(makePage("Quản lý Lô hàng"),   "LO_HANG");
+         mainContent.add(new KhachHangPanel(),"KHACH_HANG");
          
-         // Luong: Chỗ 3 - thêm panel vào mainContent
-         mainContent.add(new ThongKePanel(), "THONG_KE");
-         
+         mainContent.add(makePage("Báo cáo Thống kê"),  "THONG_KE");
          mainContent.add(new QuanLyNhanVienPanel(),      "NHAN_VIEN");
 
          return mainContent;
