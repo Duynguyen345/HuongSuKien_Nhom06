@@ -292,3 +292,24 @@ BEGIN
     ORDER BY maNV;
 END;
 GO
+-- Thêm Hàng Hóa mới để test
+INSERT INTO HangHoa VALUES ('HH002', '8934588012346', N'Nước suối Aquafina', NULL, 5000, 'DU', 1);
+INSERT INTO HangHoa VALUES ('HH003', '8934588012347', N'Bánh mì ngọt', NULL, 12000, 'TP', 1);
+
+-- Thêm dữ liệu Lô Hàng (Phần test của bạn) để check số lượng nhập/tồn
+INSERT INTO LoHang VALUES ('LO002', 'HH002', '2025-04-01', '2026-04-01', 500, 450);
+INSERT INTO LoHang VALUES ('LO003', 'HH003', '2025-05-01', '2025-05-15', 50, 10);
+INSERT INTO LoHang VALUES ('LO004', 'HH001', '2025-04-20', '2025-12-31', 100, 100);
+
+-- Thêm Hóa Đơn và Chi Tiết Hóa Đơn để code Java test được hàm Thống Kê Doanh Thu
+INSERT INTO HoaDonBanHang (maHDBH, ngayLapHDBH, maNV, hinhThucThanhToan, tongTienThanhToan)
+VALUES ('HD001', GETDATE(), 'NV001', 'TIEN_MAT', 55000);
+
+INSERT INTO ChiTietHoaDon (maHDBH, maLo, soLuong, donGia, thanhTien)
+VALUES ('HD001', 'LO001', 10, 5500, 55000);
+
+INSERT INTO HoaDonBanHang (maHDBH, ngayLapHDBH, maNV, hinhThucThanhToan, tongTienThanhToan)
+VALUES ('HD002', GETDATE(), 'NV002', 'CHUYEN_KHOAN', 100000);
+
+INSERT INTO ChiTietHoaDon (maHDBH, maLo, soLuong, donGia, thanhTien)
+VALUES ('HD002', 'LO002', 20, 5000, 100000);
